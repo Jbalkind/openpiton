@@ -250,6 +250,7 @@ set CHIP_RTL_IMPL_FILES [list \
     "${DV_ROOT}/design/chip/tile/pico/rtl/pico_reset.v" \
     "${OST1_ROOT}/rtl/sparc.v" \
     "${OST1_ROOT}/rtl/sparc_core.v" \
+    "${OST1_ROOT}/rtl/sparc_tri.v" \
     "${OST1_ROOT}/rtl/cpx_spc_rpt.v" \
     "${OST1_ROOT}/rtl/cpx_spc_buf.v" \
     "${OST1_ROOT}/rtl/cfg_asi.v" \
