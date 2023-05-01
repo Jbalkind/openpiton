@@ -31,47 +31,15 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-// Address Map Defines
-// ===================
-`define ADDR_MAP_HI      39
-`define ADDR_MAP_LO      32
-`define IO_ADDR_BIT      39
-
-// CMP space
-`define DRAM_DATA_LO     8'h00
-`define DRAM_DATA_HI     8'h7f
-
 // IOP space
 `define JBUS1            8'h80
-`define RESERVED_5	 8'h81 //`define HASH_TBL_NRAM_CSR 8'h81
 `define RESERVED_1       8'h82
-`define RESERVED_6_LO    8'h83 //`define ENET_MAC_CSR     8'h83
-                               //`define ENET_ING_CSR     8'h84
-                               //`define ENET_EGR_CMD_CSR 8'h85
-`define RESERVED_6_HI    8'h86 //`define ENET_EGR_DP_CSR  8'h86
 `define RESERVED_2_LO    8'h87
 `define RESERVED_2_HI    8'h92
-`define RESERVED_7       8'h93 //`define BSC_CSR          8'h93
 `define RESERVED_3       8'h94
-`define RESERVED_8       8'h95 //`define RAND_GEN_CSR     8'h95
-`define CLOCK_UNIT_CSR   8'h96
-`define DRAM_CSR         8'h97
-`define IOB_MAN_CSR      8'h98
-`define TAP_CSR          8'h99
 `define RESERVED_4_L0    8'h9a
 `define RESERVED_4_HI    8'h9d
 `define CPU_ASI          8'h9e
-`define IOB_INT_CSR      8'h9f
-
-// L2 space
-`define L2C_CSR_LO       8'ha0
-`define L2C_CSR_HI       8'hbf
-
-// More IOP space
-`define JBUS2_LO         8'hc0
-`define JBUS2_HI         8'hfe
-`define SPI_CSR          8'hff
-
 
 //Cache Crossbar Width and Field Defines
 //======================================
@@ -206,329 +174,7 @@
 `define FWD_RPY_RET     4'b1011
 `define RSVD_RET        4'b1111
 
-//Pico defines
-`define PICO_MEM_DATA_LO 0
-`define PICO_MEM_DATA_HI 31
-`define PICO_MEM_ADDR_LO 32
-`define PICO_MEM_ADDR_HI 63
-`define PICO_MEM_WSTRB_LO 64
-`define PICO_MEM_WSTRB_HI 67
-`define PICO_MEM_VALID    68
-
-`define PICO_CPX_INT      32
-`define PICO_INT_TYPE     17:16
-
-`define PICO_PCX_UNUSED   123:69
-`define PICO_CPX_UNUSED   144:33
 //End cache crossbar defines
-
-
-// Number of COS supported by EECU 
-`define EECU_COS_NUM  	  2
-
-
-// 
-// BSC bus sizes
-// =============
-//
-
-// General
-`define BSC_ADDRESS      40
-`define MAX_XFER_LEN     7'b0
-`define XFER_LEN_WIDTH   6
-
-// CTags
-`define BSC_CTAG_SZ      12
-`define EICU_CTAG_PRE    5'b11101
-`define EICU_CTAG_REM    7
-`define EIPU_CTAG_PRE    3'b011
-`define EIPU_CTAG_REM    9
-`define EECU_CTAG_PRE    8'b11010000
-`define EECU_CTAG_REM    4
-`define EEPU_CTAG_PRE    6'b010000
-`define EEPU_CTAG_REM    6
-`define L2C_CTAG_PRE     2'b00
-`define L2C_CTAG_REM     10
-`define JBI_CTAG_PRE     2'b10
-`define JBI_CTAG_REM     10
-// reinstated temporarily
-`define PCI_CTAG_PRE     7'b1101100
-`define PCI_CTAG_REM     5
-
-
-// CoS
-`define EICU_COS         1'b0
-`define EIPU_COS         1'b1
-`define EECU_COS         1'b0
-`define EEPU_COS         1'b1
-`define PCI_COS          1'b0
-
-// L2$ Bank
-`define BSC_L2_BNK_HI    8
-`define BSC_L2_BNK_LO    6
-
-// L2$ Req
-`define BSC_L2_REQ_SZ   62
-`define BSC_L2_REQ	`BSC_L2_REQ_SZ	// used by rams in L2 code
-`define BSC_L2_BUS      64
-`define BSC_L2_CTAG_HI  61
-`define BSC_L2_CTAG_LO  50
-`define BSC_L2_ADD_HI   49
-`define BSC_L2_ADD_LO   10
-`define BSC_L2_LEN_HI    9
-`define BSC_L2_LEN_LO    3
-`define BSC_L2_ALLOC     2
-`define BSC_L2_COS       1
-`define BSC_L2_READ      0   
-
-// L2$ Ack
-`define L2_BSC_ACK_SZ   16
-`define L2_BSC_BUS      64
-`define L2_BSC_CBA_HI   14    // CBA - Critical Byte Address
-`define L2_BSC_CBA_LO   13
-`define L2_BSC_READ     12
-`define L2_BSC_CTAG_HI  11
-`define L2_BSC_CTAG_LO   0
-
-// Enet Egress Command Unit
-`define EECU_REQ_BUS    44
-`define EECU_REQ_SZ     44
-`define EECU_R_QID_HI   43
-`define EECU_R_QID_LO   40
-`define EECU_R_ADD_HI   39
-`define EECU_R_ADD_LO    0
-
-`define EECU_ACK_BUS    64
-`define EECU_ACK_SZ      5
-`define EECU_A_NACK      4
-`define EECU_A_QID_HI    3
-`define EECU_A_QID_LO    0
-
-
-// Enet Egress Packet Unit
-`define EEPU_REQ_BUS    55
-`define EEPU_REQ_SZ     55
-`define EEPU_R_TLEN_HI  54
-`define EEPU_R_TLEN_LO  48
-`define EEPU_R_SOF      47
-`define EEPU_R_EOF      46
-`define EEPU_R_PORT_HI  45
-`define EEPU_R_PORT_LO  44
-`define EEPU_R_QID_HI   43
-`define EEPU_R_QID_LO   40
-`define EEPU_R_ADD_HI   39
-`define EEPU_R_ADD_LO    0
-
-// This is cleaved in between Egress Datapath Ack's
-`define EEPU_ACK_BUS     6
-`define EEPU_ACK_SZ      6
-`define EEPU_A_EOF       5
-`define EEPU_A_NACK      4
-`define EEPU_A_QID_HI    3
-`define EEPU_A_QID_LO    0
-
-
-// Enet Egress Datapath
-`define EEDP_ACK_BUS   128
-`define EEDP_ACK_SZ     28
-`define EEDP_A_NACK     27
-`define EEDP_A_QID_HI   26
-`define EEDP_A_QID_LO   21
-`define EEDP_A_SOF      20
-`define EEDP_A_EOF      19
-`define EEDP_A_LEN_HI   18
-`define EEDP_A_LEN_LO   12
-`define EEDP_A_TAG_HI   11
-`define EEDP_A_TAG_LO    0
-`define EEDP_A_PORT_HI   5
-`define EEDP_A_PORT_LO   4
-`define EEDP_A_PORT_WIDTH 2
-
-
-// In-Order / Ordered Queue: EEPU
-// Tag is: TLEN, SOF, EOF, QID = 15
-`define EEPU_TAG_ARY     (7+1+1+6)
-`define EEPU_ENTRIES     16
-`define EEPU_E_IDX        4
-`define EEPU_PORTS        4
-`define EEPU_P_IDX        2
-
-// Nack + Tag Info + CTag
-`define IOQ_TAG_ARY      (1+`EEPU_TAG_ARY+12)
-`define EEPU_TAG_LOC     (`EEPU_P_IDX+`EEPU_E_IDX)
-
-
-// ENET Ingress Queue Management Req
-`define EICU_REQ_BUS     64 
-`define EICU_REQ_SZ      62
-`define EICU_R_CTAG_HI   61
-`define EICU_R_CTAG_LO   50
-`define EICU_R_ADD_HI    49
-`define EICU_R_ADD_LO    10
-`define EICU_R_LEN_HI     9
-`define EICU_R_LEN_LO     3
-`define EICU_R_COS        1
-`define EICU_R_READ       0   
-
-
-// ENET Ingress Queue Management Ack
-`define EICU_ACK_BUS     64
-`define EICU_ACK_SZ      14
-`define EICU_A_NACK      13
-`define EICU_A_READ      12
-`define EICU_A_CTAG_HI   11
-`define EICU_A_CTAG_LO    0
-
-
-// Enet Ingress Packet Unit
-`define EIPU_REQ_BUS    128 
-`define EIPU_REQ_SZ      59
-`define EIPU_R_CTAG_HI   58
-`define EIPU_R_CTAG_LO   50
-`define EIPU_R_ADD_HI    49
-`define EIPU_R_ADD_LO    10
-`define EIPU_R_LEN_HI     9
-`define EIPU_R_LEN_LO     3
-`define EIPU_R_COS        1
-`define EIPU_R_READ       0   
-
-
-// ENET Ingress Packet Unit Ack
-`define EIPU_ACK_BUS      10
-`define EIPU_ACK_SZ       10
-`define EIPU_A_NACK       9
-`define EIPU_A_CTAG_HI    8
-`define EIPU_A_CTAG_LO    0
-
-
-// In-Order / Ordered Queue: PCI
-// Tag is: CTAG
-`define PCI_TAG_ARY     12
-`define PCI_ENTRIES     16
-`define PCI_E_IDX        4
-`define PCI_PORTS        2
-
-// PCI-X Request
-`define PCI_REQ_BUS      64
-`define PCI_REQ_SZ       62
-`define PCI_R_CTAG_HI    61
-`define PCI_R_CTAG_LO    50
-`define PCI_R_ADD_HI     49
-`define PCI_R_ADD_LO     10
-`define PCI_R_LEN_HI      9
-`define PCI_R_LEN_LO      3
-`define PCI_R_COS         1
-`define PCI_R_READ        0
-
-// PCI_X Acknowledge
-`define PCI_ACK_BUS      64
-`define PCI_ACK_SZ       14
-`define PCI_A_NACK       13
-`define PCI_A_READ       12 
-`define PCI_A_CTAG_HI    11
-`define PCI_A_CTAG_LO     0
-
-
-`define BSC_MAX_REQ_SZ   62
-
-
-//
-// BSC array sizes
-//================
-//
-`define BSC_REQ_ARY_INDEX        6
-`define BSC_REQ_ARY_DEPTH       64
-`define BSC_REQ_ARY_WIDTH       62
-`define BSC_REQ_NXT_WIDTH       12
-`define BSC_ACK_ARY_INDEX        6
-`define BSC_ACK_ARY_DEPTH       64
-`define BSC_ACK_ARY_WIDTH       14
-`define BSC_ACK_NXT_WIDTH       12
-`define BSC_PAY_ARY_INDEX        6
-`define BSC_PAY_ARY_DEPTH       64
-`define BSC_PAY_ARY_WIDTH      256
-
-// ECC syndrome bits per memory element
-`define BSC_PAY_ECC             10
-`define BSC_PAY_MEM_WIDTH       (`BSC_PAY_ECC+`BSC_PAY_ARY_WIDTH)
-
-
-//
-// BSC Port Definitions
-// ====================
-//
-// Bits 7 to 4 of curr_port_id
-`define BSC_PORT_NULL       4'h0
-`define BSC_PORT_SC         4'h1
-`define BSC_PORT_EICU       4'h2
-`define BSC_PORT_EIPU       4'h3
-`define BSC_PORT_EECU       4'h4
-`define BSC_PORT_EEPU       4'h8
-`define BSC_PORT_PCI        4'h9
-
-// Number of ports of each type
-`define BSC_PORT_SC_CNT     8
-
-// Bits needed to represent above
-`define BSC_PORT_SC_IDX     3
-
-// How wide the linked list pointers are
-// 60b for no payload (2CoS)
-// 80b for payload (2CoS)
-
-//`define BSC_OBJ_PTR   80
-//`define BSC_HD1_HI    69
-//`define BSC_HD1_LO    60
-//`define BSC_TL1_HI    59
-//`define BSC_TL1_LO    50
-//`define BSC_CT1_HI    49
-//`define BSC_CT1_LO    40
-//`define BSC_HD0_HI    29
-//`define BSC_HD0_LO    20
-//`define BSC_TL0_HI    19
-//`define BSC_TL0_LO    10
-//`define BSC_CT0_HI     9
-//`define BSC_CT0_LO     0
-
-`define BSC_OBJP_PTR  48
-`define BSC_PYP1_HI   47
-`define BSC_PYP1_LO   42
-`define BSC_HDP1_HI   41
-`define BSC_HDP1_LO   36
-`define BSC_TLP1_HI   35
-`define BSC_TLP1_LO   30
-`define BSC_CTP1_HI   29
-`define BSC_CTP1_LO   24
-`define BSC_PYP0_HI   23
-`define BSC_PYP0_LO   18
-`define BSC_HDP0_HI   17
-`define BSC_HDP0_LO   12
-`define BSC_TLP0_HI   11
-`define BSC_TLP0_LO    6
-`define BSC_CTP0_HI    5
-`define BSC_CTP0_LO    0
-
-`define BSC_PTR_WIDTH     192
-`define BSC_PTR_REQ_HI    191
-`define BSC_PTR_REQ_LO    144
-`define BSC_PTR_REQP_HI   143
-`define BSC_PTR_REQP_LO    96
-`define BSC_PTR_ACK_HI     95
-`define BSC_PTR_ACK_LO     48
-`define BSC_PTR_ACKP_HI    47
-`define BSC_PTR_ACKP_LO     0
-
-`define BSC_PORT_SC_PTR    96       // R, R+P
-`define BSC_PORT_EECU_PTR  48       // A+P
-`define BSC_PORT_EICU_PTR  96       // A, A+P
-`define BSC_PORT_EIPU_PTR  48       // A
-
-// I2C STATES in DRAMctl
-`define I2C_CMD_NOP   4'b0000
-`define I2C_CMD_START 4'b0001
-`define I2C_CMD_STOP  4'b0010
-`define I2C_CMD_WRITE 4'b0100
-`define I2C_CMD_READ  4'b1000
 
 
 //
@@ -576,9 +222,6 @@
 `define IOB_DISP_THR_LO       8
 `define IOB_DISP_VEC_HI       5
 `define IOB_DISP_VEC_LO       0
-
-`define IOB_JBI_RESET         1
-`define IOB_ENET_RESET        0
 
 `define IOB_RESET_STAT_WIDTH  3
 `define IOB_RESET_STAT_HI     3
@@ -638,8 +281,6 @@
 `define IOB_CREG_DBG_L2VIS_CMPB    32'h00001838
 `define IOB_CREG_DBG_L2VIS_TRIG    32'h00001840
 `define IOB_CREG_DBG_IOBVIS_CTRL   32'h00001000
-`define IOB_CREG_DBG_ENET_CTRL     32'h00002000
-`define IOB_CREG_DBG_ENET_IDLEVAL  32'h00002008
 `define IOB_CREG_DBG_JBUS_CTRL     32'h00002100
 `define IOB_CREG_DBG_JBUS_LO_MASK0 32'h00002140
 `define IOB_CREG_DBG_JBUS_LO_MASK1 32'h00002160
@@ -674,49 +315,10 @@
 // CIOP UCB Bus Width
 // ==================
 //
-//`define IOB_EECU_WIDTH       16  // ethernet egress command
-//`define EECU_IOB_WIDTH       16
-
-//`define IOB_NRAM_WIDTH       16  // NRAM (RLDRAM previously)
-//`define NRAM_IOB_WIDTH        4
-
-`define IOB_JBI_WIDTH        64  // JBI
-`define JBI_IOB_WIDTH        16 
-
-//`define IOB_ENET_ING_WIDTH   32  // ethernet ingress
-//`define ENET_ING_IOB_WIDTH    8
-
-//`define IOB_ENET_EGR_WIDTH    4  // ethernet egress
-//`define ENET_EGR_IOB_WIDTH    4
-
-//`define IOB_ENET_MAC_WIDTH    4  // ethernet MAC
-//`define ENET_MAC_IOB_WIDTH    4
-
-`define IOB_DRAM_WIDTH        4  // DRAM controller
-`define DRAM_IOB_WIDTH        4
-
-//`define IOB_BSC_WIDTH         4  // BSC
-//`define BSC_IOB_WIDTH         4
-
-`define IOB_SPI_WIDTH         4  // SPI (Boot ROM)
-`define SPI_IOB_WIDTH         4
-
-`define IOB_CLK_WIDTH         4  // clk unit
-`define CLK_IOB_WIDTH         4
-
-//`define IOB_CLSP_WIDTH        4  // clk spine unit
-//`define CLSP_IOB_WIDTH        4
 
 `define IOB_TAP_WIDTH         8  // TAP
 `define TAP_IOB_WIDTH         8
 
-
-//
-// CIOP UCB Buf ID Type
-// ====================
-//
-`define UCB_BID_CMP          2'b00
-`define UCB_BID_TAP          2'b01
 
 //
 // Interrupt Device ID
@@ -743,41 +345,6 @@
 
 
 //
-// NRAM/IO Interface
-// =================
-//
-
-`define DRAM_CLK_PERIOD  6000
-
-`define NRAM_IO_DQ_WIDTH   32
-`define IO_NRAM_DQ_WIDTH   32
-
-`define NRAM_IO_ADDR_WIDTH 15
-`define NRAM_IO_BA_WIDTH    2
-
-
-//
-// NRAM/ENET Interface
-// ===================
-//
-
-`define NRAM_ENET_DATA_WIDTH 64
-`define ENET_NRAM_ADDR_WIDTH 20
-
-`define NRAM_DBG_DATA_WIDTH  40
-
-
-//
-// IO/FCRAM Interface
-// ==================
-//
-
-`define FCRAM_DATA1_HI       63
-`define FCRAM_DATA1_LO       32
-`define FCRAM_DATA0_HI       31
-`define FCRAM_DATA0_LO        0
-
-//
 // PCI Interface
 // ==================
 // Load/store size encodings
@@ -794,83 +361,3 @@
 `define LDST_SZ_DOUBLE_WORD 3'b011
 `define LDST_SZ_QUAD        3'b100
 
-//
-// JBI<->SCTAG Interface
-// =======================
-// Outbound Header Format
-`define JBI_BTU_OUT_ADDR_LO      0
-`define JBI_BTU_OUT_ADDR_HI     42
-`define JBI_BTU_OUT_RSV0_LO     43
-`define JBI_BTU_OUT_RSV0_HI     43
-`define JBI_BTU_OUT_TYPE_LO     44
-`define JBI_BTU_OUT_TYPE_HI     48
-`define JBI_BTU_OUT_RSV1_LO     49
-`define JBI_BTU_OUT_RSV1_HI     51
-`define JBI_BTU_OUT_REPLACE_LO  52
-`define JBI_BTU_OUT_REPLACE_HI  56
-`define JBI_BTU_OUT_RSV2_LO     57
-`define JBI_BTU_OUT_RSV2_HI     59
-`define JBI_BTU_OUT_BTU_ID_LO   60
-`define JBI_BTU_OUT_BTU_ID_HI   71
-`define JBI_BTU_OUT_DATA_RTN    72
-`define JBI_BTU_OUT_RSV3_LO     73
-`define JBI_BTU_OUT_RSV3_HI     75
-`define JBI_BTU_OUT_CE          76
-`define JBI_BTU_OUT_RSV4_LO     77
-`define JBI_BTU_OUT_RSV4_HI     79
-`define JBI_BTU_OUT_UE          80
-`define JBI_BTU_OUT_RSV5_LO     81
-`define JBI_BTU_OUT_RSV5_HI     83
-`define JBI_BTU_OUT_DRAM        84
-`define JBI_BTU_OUT_RSV6_LO     85
-`define JBI_BTU_OUT_RSV6_HI    127
-
-// Inbound Header Format
-`define JBI_SCTAG_IN_ADDR_LO   0
-`define JBI_SCTAG_IN_ADDR_HI  39
-`define JBI_SCTAG_IN_SZ_LO    40
-`define JBI_SCTAG_IN_SZ_HI    42
-`define JBI_SCTAG_IN_RSV0     43
-`define JBI_SCTAG_IN_TAG_LO   44
-`define JBI_SCTAG_IN_TAG_HI   55
-`define JBI_SCTAG_IN_REQ_LO   56
-`define JBI_SCTAG_IN_REQ_HI   58
-`define JBI_SCTAG_IN_POISON   59
-`define JBI_SCTAG_IN_RSV1_LO  60
-`define JBI_SCTAG_IN_RSV1_HI  63
-
-`define JBI_SCTAG_REQ_WRI   3'b100
-`define JBI_SCTAG_REQ_WR8   3'b010
-`define JBI_SCTAG_REQ_RDD   3'b001
-`define JBI_SCTAG_REQ_WRI_BIT 2
-`define JBI_SCTAG_REQ_WR8_BIT 1
-`define JBI_SCTAG_REQ_RDD_BIT 0
-
-//
-// JBI->IOB Mondo Header Format
-// ============================
-//
-`define JBI_IOB_MONDO_RSV1_HI       15 // reserved 1
-`define JBI_IOB_MONDO_RSV1_LO       13
-`define JBI_IOB_MONDO_TRG_HI        12 // interrupt target
-`define JBI_IOB_MONDO_TRG_LO         8 
-`define JBI_IOB_MONDO_RSV0_HI        7 // reserved 0
-`define JBI_IOB_MONDO_RSV0_LO        5
-`define JBI_IOB_MONDO_SRC_HI         4 // interrupt source
-`define JBI_IOB_MONDO_SRC_LO         0
-
-`define JBI_IOB_MONDO_RSV1_WIDTH     3 
-`define JBI_IOB_MONDO_TRG_WIDTH      5
-`define JBI_IOB_MONDO_RSV0_WIDTH     3 
-`define JBI_IOB_MONDO_SRC_WIDTH      5
-
-// JBI->IOB Mondo Bus Width/Cycle
-// ==============================
-// Cycle  1 Header[15:8]
-// Cycle  2 Header[ 7:0]
-// Cycle  3 J_AD[127:120]
-// Cycle  4 J_AD[119:112]
-// .....
-// Cycle 18 J_AD[  7:  0]
-`define JBI_IOB_MONDO_BUS_WIDTH      8
-`define JBI_IOB_MONDO_BUS_CYCLE     18 // 2 header + 16 data
