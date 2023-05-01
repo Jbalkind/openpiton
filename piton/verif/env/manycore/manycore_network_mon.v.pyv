@@ -36,8 +36,6 @@
         print("`define XBAR_CONFIG")
 %>
 
-`ifndef USE_TEST_TOP // useless for older TOPs
-
 module manycore_network_mon (
     input wire clk
     );
@@ -304,5 +302,3 @@ end
 `endif
 `endif // DISABLE_ALL_MONITORS
 endmodule
-
-`endif
