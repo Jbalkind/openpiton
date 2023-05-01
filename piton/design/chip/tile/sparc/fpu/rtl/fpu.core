@@ -7,7 +7,7 @@ filesets:
         depend:
             - openpiton::piton_include
             - openpiton::piton_tile_common
-            - openpiton::piton_tile_common_srams
+            - openpiton::sparc_srams
         files:
             - fpu.v
             - fpu_add.v

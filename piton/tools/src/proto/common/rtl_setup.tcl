@@ -197,7 +197,6 @@ set CHIP_RTL_IMPL_FILES [list \
     "${DV_ROOT}/design/chip/tile/common/rtl/clk_gating_latch.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/test_stub_scan.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/synchronizer_asr.v" \
-    "${DV_ROOT}/design/chip/tile/common/srams/rtl/bw_r_rf16x160.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/test_stub_bist.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/cluster_header.v" \
     "${DV_ROOT}/design/chip/tile/pico/rtl/picorv32.v" \
@@ -380,6 +379,7 @@ set CHIP_RTL_IMPL_FILES [list \
     "${OST1_ROOT}/srams/rtl/bw_r_frf.v" \
     "${OST1_ROOT}/srams/rtl/bw_r_rf32x80.v" \
     "${OST1_ROOT}/srams/rtl/bw_r_rf32x152b.v" \
+    "${OST1_ROOT}/srams/rtl/bw_r_rf16x160.v" \
     "${OST1_ROOT}/srams/rtl/sram_l1d_val.v" \
     "${OST1_ROOT}/srams/rtl/sram_l1i_val.v" \
     "${OST1_ROOT}/srams/rtl/sram_wrappers/sram_1rw_128x78.v" \
