@@ -180,44 +180,6 @@ set CHIP_RTL_IMPL_FILES [list \
     "${DV_ROOT}/design/chip/tile/dynamic_node/dynamic/rtl/dynamic_input_route_request_calc_para.v" \
     "${DV_ROOT}/design/chip/tile/dynamic_node/components/rtl/one_of_n.v" \
     "${DV_ROOT}/design/chip/tile/dynamic_node/components/rtl/one_of_n_plus_3.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_arb_wrap.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_arb.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_buf.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_out.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_mul.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_in.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_div.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_add.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_in2_gt_in1_frac.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_denorm_frac.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_cnt_lead0_64b.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_cnt_lead0_53b.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_rptr_min_global.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_rptr_macros.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_out_dp.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_out_ctl.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_mul_frac_dp.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_mul_exp_dp.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_mul_ctl.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_in_dp.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_in_ctl.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_div_frac_dp.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_div_exp_dp.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_div_ctl.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_add_frac_dp.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_add_exp_dp.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_add_ctl.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_rptr_groups.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_in2_gt_in1_3to1.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_in2_gt_in1_3b.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_in2_gt_in1_2b.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_denorm_3to1.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_denorm_3b.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_cnt_lead0_lvl4.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_cnt_lead0_lvl3.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_cnt_lead0_lvl2.v" \
-    "${DV_ROOT}/design/chip/tile/fpu/rtl/fpu_cnt_lead0_lvl1.v" \
     "${DV_ROOT}/design/chip/tile/rtap/rtl/rtap.v" \
     "${DV_ROOT}/design/chip/tile/rtap/rtl/rtap_ucb_transmitter.v" \
     "${DV_ROOT}/design/chip/tile/rtap/rtl/rtap_ucb_receiver.v" \
@@ -254,6 +216,44 @@ set CHIP_RTL_IMPL_FILES [list \
     "${OST1_ROOT}/rtl/cpx_spc_rpt.v" \
     "${OST1_ROOT}/rtl/cpx_spc_buf.v" \
     "${OST1_ROOT}/rtl/cfg_asi.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_arb_wrap.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_arb.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_buf.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_out.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_mul.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_in.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_div.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_add.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_in2_gt_in1_frac.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_denorm_frac.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_cnt_lead0_64b.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_cnt_lead0_53b.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_rptr_min_global.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_rptr_macros.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_out_dp.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_out_ctl.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_mul_frac_dp.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_mul_exp_dp.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_mul_ctl.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_in_dp.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_in_ctl.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_div_frac_dp.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_div_exp_dp.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_div_ctl.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_add_frac_dp.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_add_exp_dp.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_add_ctl.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_rptr_groups.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_in2_gt_in1_3to1.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_in2_gt_in1_3b.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_in2_gt_in1_2b.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_denorm_3to1.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_denorm_3b.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_cnt_lead0_lvl4.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_cnt_lead0_lvl3.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_cnt_lead0_lvl2.v" \
+    "${OST1_ROOT}/fpu/rtl/fpu_cnt_lead0_lvl1.v" \
     "${OST1_ROOT}/exu/rtl/sparc_exu_wrap.v" \
     "${OST1_ROOT}/exu/rtl/sparc_exu.v" \
     "${OST1_ROOT}/exu/rtl/sparc_exu_shft.v" \
