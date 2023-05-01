@@ -15,6 +15,7 @@ filesets:
             - openpiton::sparc_mul
             - openpiton::sparc_ffu
         files:
+            - sparc_tri.v
             - sparc_core.v
             - sparc.v
             - cpx_spc_rpt.v

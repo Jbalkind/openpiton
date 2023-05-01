@@ -197,17 +197,9 @@ set CHIP_RTL_IMPL_FILES [list \
     "${DV_ROOT}/design/chip/tile/common/rtl/clk_gating_latch.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/test_stub_scan.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/synchronizer_asr.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/synchronizer_asr_dup.v" \
     "${DV_ROOT}/design/chip/tile/common/srams/rtl/bw_r_rf16x160.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/ucb_flow_2buf.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/sync_pulse_synchronizer.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/dbl_buf.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/ucb_flow_spi.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/test_stub_bist.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/ucb_flow_jbi.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/ucb_noflow.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/cluster_header.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/cluster_header_ctu.v" \
     "${DV_ROOT}/design/chip/tile/pico/rtl/picorv32.v" \
     "${DV_ROOT}/design/chip/tile/pico/rtl/pico_reset.v" \
     "${OST1_ROOT}/rtl/sparc.v" \
