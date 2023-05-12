@@ -922,59 +922,6 @@ assign passthru_pll_rst_n = 1'b1;
 `endif // NEXYSVIDEO_BOARD
 `endif // PITON_RV64_DEBUGUNIT
 
-`ifdef PITONSYS_MEEP
-wire [`AXI4_ID_WIDTH     -1:0]     m_axi_awid;
-wire [`AXI4_ADDR_WIDTH   -1:0]     m_axi_awaddr;
-wire [`AXI4_LEN_WIDTH    -1:0]     m_axi_awlen;
-wire [`AXI4_SIZE_WIDTH   -1:0]     m_axi_awsize;
-wire [`AXI4_BURST_WIDTH  -1:0]     m_axi_awburst;
-wire                               m_axi_awlock;
-wire [`AXI4_CACHE_WIDTH  -1:0]     m_axi_awcache;
-wire [`AXI4_PROT_WIDTH   -1:0]     m_axi_awprot;
-wire [`AXI4_QOS_WIDTH    -1:0]     m_axi_awqos;
-wire [`AXI4_REGION_WIDTH -1:0]     m_axi_awregion;
-wire [`AXI4_USER_WIDTH   -1:0]     m_axi_awuser;
-wire                               m_axi_awvalid;
-wire                               m_axi_awready;
-
-wire  [`AXI4_ID_WIDTH     -1:0]    m_axi_wid;
-wire  [`AXI4_DATA_WIDTH   -1:0]    m_axi_wdata;
-wire  [`AXI4_STRB_WIDTH   -1:0]    m_axi_wstrb;
-wire                               m_axi_wlast;
-wire  [`AXI4_USER_WIDTH   -1:0]    m_axi_wuser;
-wire                               m_axi_wvalid;
-wire                               m_axi_wready;
-
-wire  [`AXI4_ID_WIDTH     -1:0]    m_axi_arid;
-wire  [`AXI4_ADDR_WIDTH   -1:0]    m_axi_araddr;
-wire  [`AXI4_LEN_WIDTH    -1:0]    m_axi_arlen;
-wire  [`AXI4_SIZE_WIDTH   -1:0]    m_axi_arsize;
-wire  [`AXI4_BURST_WIDTH  -1:0]    m_axi_arburst;
-wire                               m_axi_arlock;
-wire  [`AXI4_CACHE_WIDTH  -1:0]    m_axi_arcache;
-wire  [`AXI4_PROT_WIDTH   -1:0]    m_axi_arprot;
-wire  [`AXI4_QOS_WIDTH    -1:0]    m_axi_arqos;
-wire  [`AXI4_REGION_WIDTH -1:0]    m_axi_arregion;
-wire  [`AXI4_USER_WIDTH   -1:0]    m_axi_aruser;
-wire                               m_axi_arvalid;
-wire                               m_axi_arready;
-
-wire  [`AXI4_ID_WIDTH     -1:0]    m_axi_rid;
-wire  [`AXI4_DATA_WIDTH   -1:0]    m_axi_rdata;
-wire  [`AXI4_RESP_WIDTH   -1:0]    m_axi_rresp;
-wire                               m_axi_rlast;
-wire  [`AXI4_USER_WIDTH   -1:0]    m_axi_ruser;
-wire                               m_axi_rvalid;
-wire                               m_axi_rready;
-
-wire  [`AXI4_ID_WIDTH     -1:0]    m_axi_bid;
-wire  [`AXI4_RESP_WIDTH   -1:0]    m_axi_bresp;
-wire  [`AXI4_USER_WIDTH   -1:0]    m_axi_buser;
-wire                               m_axi_bvalid;
-wire                               m_axi_bready;
-
-`endif
-
 //////////////////////////
 // Sub-module Instances //
 //////////////////////////
@@ -1208,27 +1155,6 @@ passthru passthru(
 );
 `endif // endif PITONSYS_INC_PASSTHRU
 
-`ifndef PITONSYS_MEEP
-wire  [12:0]      uart_axi_awaddr;
-wire              uart_axi_awvalid;
-wire              uart_axi_awready;
-wire  [31:0]      uart_axi_wdata;
-wire  [3:0 ]      uart_axi_wstrb;
-wire              uart_axi_wvalid;
-wire              uart_axi_wready;
-wire  [1:0]       uart_axi_bresp;
-wire              uart_axi_bvalid;
-wire              uart_axi_bready;
-wire  [12:0]      uart_axi_araddr;
-wire              uart_axi_arvalid;
-wire              uart_axi_arready;
-wire  [31:0]      uart_axi_rdata;
-wire  [1:0]       uart_axi_rresp;
-wire              uart_axi_rvalid;
-wire              uart_axi_rready;
-`endif
-
-
 `ifdef PITONSYS_MEEP
 //wire chipset_clk;
 assign core_ref_clk = chipset_clk;
@@ -1402,116 +1328,6 @@ chipset chipset(
 `endif // endif NEXYSVIDEO_BOARD
 `ifdef XUPP3R_BOARD
     .ddr_parity(ddr_parity),
-`elsif ALVEOU280_BOARD
-            `ifdef PITONSYS_MEEP
-            
-             .hbm_calib_complete (mem_calib_complete),
-            
-            .m_axi_awid      (mem_axi_awid     ),
-            .m_axi_awaddr    (mem_axi_awaddr   ),
-            .m_axi_awlen     (mem_axi_awlen    ),
-            .m_axi_awsize    (mem_axi_awsize   ),
-            .m_axi_awburst   (mem_axi_awburst  ),
-            .m_axi_awlock    (mem_axi_awlock   ),
-            .m_axi_awcache   (mem_axi_awcache  ),
-            .m_axi_awprot    (mem_axi_awprot   ),
-            .m_axi_awqos     (mem_axi_awqos    ),
-            .m_axi_awregion  (mem_axi_awregion ),
-            .m_axi_awuser    (mem_axi_awuser   ),
-            .m_axi_awvalid   (mem_axi_awvalid  ),
-            .m_axi_awready   (mem_axi_awready  ),
-            
-            .m_axi_wid       (mem_axi_wid      ),
-            .m_axi_wdata     (mem_axi_wdata    ),
-            .m_axi_wstrb     (mem_axi_wstrb    ),
-            .m_axi_wlast     (mem_axi_wlast    ),
-            .m_axi_wuser     (mem_axi_wuser    ),
-            .m_axi_wvalid    (mem_axi_wvalid   ),
-            .m_axi_wready    (mem_axi_wready   ),
-            
-            .m_axi_arid      (mem_axi_arid     ),
-            .m_axi_araddr    (mem_axi_araddr   ),
-            .m_axi_arlen     (mem_axi_arlen    ),
-            .m_axi_arsize    (mem_axi_arsize   ),
-            .m_axi_arburst   (mem_axi_arburst  ),
-            .m_axi_arlock    (mem_axi_arlock   ),
-            .m_axi_arcache   (mem_axi_arcache  ),
-            .m_axi_arprot    (mem_axi_arprot   ),
-            .m_axi_arqos     (mem_axi_arqos    ),
-            .m_axi_arregion  (mem_axi_arregion ),
-            .m_axi_aruser    (mem_axi_aruser   ),
-            .m_axi_arvalid   (mem_axi_arvalid  ),
-            .m_axi_arready   (mem_axi_arready  ),
-            
-            .m_axi_rid       (mem_axi_rid      ),
-            .m_axi_rdata     (mem_axi_rdata    ),
-            .m_axi_rresp     (mem_axi_rresp    ),
-            .m_axi_rlast     (mem_axi_rlast    ),
-            .m_axi_ruser     (mem_axi_ruser    ),
-            .m_axi_rvalid    (mem_axi_rvalid   ),
-            .m_axi_rready    (mem_axi_rready   ),
-            
-            .m_axi_bid       (mem_axi_bid      ),
-            .m_axi_bresp     (mem_axi_bresp    ),
-            .m_axi_buser     (mem_axi_buser    ),
-            .m_axi_bvalid    (mem_axi_bvalid   ),
-            .m_axi_bready    (mem_axi_bready   ),
-			
-		    .sram_axi_araddr(sram_axi_araddr),
-		    .sram_axi_arburst(sram_axi_arburst),
-		    .sram_axi_arcache(sram_axi_arcache),
-		    .sram_axi_arid(sram_axi_arid),
-		    .sram_axi_arlen(sram_axi_arlen),
-		    .sram_axi_arlock(sram_axi_arlock),
-		    .sram_axi_arprot(sram_axi_arprot),
-		    // .axi4_sram_arqos(sram_axi_arqos),
-		    .sram_axi_arready(sram_axi_arready),
-		    .sram_axi_arsize(sram_axi_arsize),
-		    // .axi4_sram_aruser(sram_axi_aruser),
-		    .sram_axi_arvalid(sram_axi_arvalid),
-		    
-		    .sram_axi_awaddr(sram_axi_awaddr),
-		    .sram_axi_awburst(sram_axi_awburst),
-		    .sram_axi_awcache(sram_axi_awcache),
-		    .sram_axi_awid(sram_axi_awid),
-		    .sram_axi_awlen(sram_axi_awlen),
-		    .sram_axi_awlock(sram_axi_awlock),
-		    .sram_axi_awprot(sram_axi_awprot),
-		    // .axi4_sram_awqos(sram_axi_awqos),
-		    .sram_axi_awready(sram_axi_awready),
-		    .sram_axi_awsize(sram_axi_awsize),
-		    // .axi4_sram_awuser(sram_axi_awuser),
-		    .sram_axi_awvalid(sram_axi_awvalid),
-		    
-		    .sram_axi_bid(sram_axi_bid),
-		    .sram_axi_bready(sram_axi_bready),
-		    .sram_axi_bresp(sram_axi_bresp),
-		    // .axi4_sram_buser(sram_axi_buser),
-		    .sram_axi_bvalid(sram_axi_bvalid),
-		    
-		    .sram_axi_rdata(sram_axi_rdata),
-		    .sram_axi_rid(sram_axi_rid),
-		    .sram_axi_rlast(sram_axi_rlast),
-		    .sram_axi_rready(sram_axi_rready),
-		    .sram_axi_rresp(sram_axi_rresp),
-		    // .axi4_sram_ruser(sram_axi_ruser),
-		    .sram_axi_rvalid(sram_axi_rvalid),
-		    
-		    .sram_axi_wdata(sram_axi_wdata),
-		    .sram_axi_wlast(sram_axi_wlast),
-		    .sram_axi_wready(sram_axi_wready),
-		    .sram_axi_wstrb(sram_axi_wstrb),
-		    // .axi4_sram_wuser(sram_axi_wuser),
-		    .sram_axi_wvalid(sram_axi_wvalid),
-
-            `else
-            .ddr_parity(ddr_parity),
-            .hbm_cattrip(hbm_cattrip),  
-            .ddr_ck_n(ddr_ck_c),
-            .ddr_ck_p(ddr_ck_t),
-            .ddr_dqs_n(ddr_dqs_c),
-            .ddr_dqs_p(ddr_dqs_t),     
-            `endif
 `else
     .ddr_dm(ddr_dm),
 `endif
@@ -1580,31 +1396,9 @@ chipset chipset(
 
 `ifdef PITONSYS_IOCTRL
 `ifdef PITONSYS_UART
-`ifdef PITONSYS_MEEP  
-              
-              .uart_axi_awaddr(uart_axi_awaddr),
-              .uart_axi_awvalid(uart_axi_awvalid),
-              .uart_axi_awready(uart_axi_awready),
-              .uart_axi_wdata(uart_axi_wdata),
-              .uart_axi_wstrb(uart_axi_wstrb),
-              .uart_axi_wvalid(uart_axi_wvalid),
-              .uart_axi_wready(uart_axi_wready),
-              .uart_axi_bresp(uart_axi_bresp),
-              .uart_axi_bvalid(uart_axi_bvalid),
-              .uart_axi_bready(uart_axi_bready),
-              .uart_axi_araddr(uart_axi_araddr),
-              .uart_axi_arvalid(uart_axi_arvalid),
-              .uart_axi_arready(uart_axi_arready),
-              .uart_axi_rdata(uart_axi_rdata),
-              .uart_axi_rresp(uart_axi_rresp),
-              .uart_axi_rvalid(uart_axi_rvalid),
-              .uart_axi_rready(uart_axi_rready),
-              .uart_irq(uart_irq),
-             `else
              ,
               .uart_tx(uart_tx),
               .uart_rx(uart_rx),
-             `endif
 `ifdef PITONSYS_UART_BOOT
     .test_start(test_start),
 `endif // endif PITONSYS_UART_BOOT
