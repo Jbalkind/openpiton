@@ -43,14 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `ifdef DEFAULT_NETTYPE_NONE
 `default_nettype none // DEFAULT_NETTYPE_NONE
 `endif
-module noc3buffer(
+module noc3buffer #(
+    parameter L15_L1D_LINE_SIZE = 64
+) (
     input wire clk,
     input wire rst_n,
 
     input wire l15_noc3encoder_req_val,
     input wire [`L15_NOC3_REQTYPE_WIDTH-1:0] l15_noc3encoder_req_type,
-    input wire [63:0] l15_noc3encoder_req_data_0,
-    input wire [63:0] l15_noc3encoder_req_data_1,
+    input wire [(L15_L1D_LINE_SIZE*8)-1:0] l15_noc3encoder_req_data,
     input wire [`L15_MSHR_ID_WIDTH-1:0] l15_noc3encoder_req_mshrid,
     input wire [`L15_THREADID_MASK] l15_noc3encoder_req_threadid,
     input wire [1:0] l15_noc3encoder_req_sequenceid,
@@ -62,8 +63,7 @@ module noc3buffer(
 
     output reg noc3buffer_noc3encoder_req_val,
     output reg [`L15_NOC3_REQTYPE_WIDTH-1:0] noc3buffer_noc3encoder_req_type,
-    output reg [63:0] noc3buffer_noc3encoder_req_data_0,
-    output reg [63:0] noc3buffer_noc3encoder_req_data_1,
+    output reg [(L15_L1D_LINE_SIZE*8)-1:0] noc3buffer_noc3encoder_req_data,
     output reg [`L15_MSHR_ID_WIDTH-1:0] noc3buffer_noc3encoder_req_mshrid,
     output reg [1:0] noc3buffer_noc3encoder_req_sequenceid,
     output reg [`L15_THREADID_MASK] noc3buffer_noc3encoder_req_threadid,
@@ -85,8 +85,7 @@ reg buffer_val;
 reg buffer_val_next;
 reg new_buffer;
 reg [`L15_NOC3_REQTYPE_WIDTH-1:0] l15_noc3encoder_req_type_buf;
-reg [63:0] l15_noc3encoder_req_data_0_buf;
-reg [63:0] l15_noc3encoder_req_data_1_buf;
+reg [(L15_L1D_LINE_SIZE*8)-1:0] l15_noc3encoder_req_data_buf;
 reg [`L15_MSHR_ID_WIDTH-1:0] l15_noc3encoder_req_mshrid_buf;
 reg [1:0] l15_noc3encoder_req_threadid_buf;
 reg [1:0] l15_noc3encoder_req_sequenceid_buf;
@@ -108,8 +107,7 @@ begin
         if (new_buffer)
         begin
             l15_noc3encoder_req_type_buf <= l15_noc3encoder_req_type;
-            l15_noc3encoder_req_data_0_buf <= l15_noc3encoder_req_data_0;
-            l15_noc3encoder_req_data_1_buf <= l15_noc3encoder_req_data_1;
+            l15_noc3encoder_req_data_buf <= l15_noc3encoder_req_data;
             l15_noc3encoder_req_mshrid_buf <= l15_noc3encoder_req_mshrid;
             l15_noc3encoder_req_threadid_buf <= l15_noc3encoder_req_threadid;
             l15_noc3encoder_req_sequenceid_buf <= l15_noc3encoder_req_sequenceid;
@@ -126,8 +124,7 @@ always @ *
 begin
     noc3buffer_noc3encoder_req_val = buffer_val;
     noc3buffer_noc3encoder_req_type = l15_noc3encoder_req_type_buf;
-    noc3buffer_noc3encoder_req_data_0 = l15_noc3encoder_req_data_0_buf;
-    noc3buffer_noc3encoder_req_data_1 = l15_noc3encoder_req_data_1_buf;
+    noc3buffer_noc3encoder_req_data = l15_noc3encoder_req_data_buf;
     noc3buffer_noc3encoder_req_mshrid = l15_noc3encoder_req_mshrid_buf;
     noc3buffer_noc3encoder_req_threadid = l15_noc3encoder_req_threadid_buf;
     noc3buffer_noc3encoder_req_sequenceid = l15_noc3encoder_req_sequenceid_buf;

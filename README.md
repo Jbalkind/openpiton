@@ -64,8 +64,15 @@ We also host GitHub repositories for other parts of the project, including:
 #### Building a simulation model
 1. ```cd $PITON_ROOT/build```
 2. ```sims -sys=manycore -x_tiles=1 -y_tiles=1 -vcs_build``` builds a single tile OpenPiton simulation model.
-3. A directory for the simulation model will be created in ```$PITON_ROOT/build``` and the simulation model can now be used to run tests.  For more details on building simulation models, please refer to the OpenPiton documentation.
+3. A directory for the simulation model will be created in ```$PITON_ROOT/build``` and the simulation model can now be used to run tests.  For more details on building simulation models, please refer to the OpenPiton documentation.For 64 B cachelines : -config_l15_l1d_cacheline_size=64 
 
+- NEW FEATURE: L1D & L1.5 parametric cacheline size. This new feature added to OpenPiton allows to change the cacheline size of the L1.5 and the L1D from 16 Bytes (default size) to 32 or 64 Bytes using the parameter -config_l15_l1d_cacheline_size during the building. 
+Examples -> 
+    For a 64 B cacheline : -config_l15_l1d_cacheline_size=64 
+    For a 32 B cacheline : -config_l15_l1d_cacheline_size=32
+    For a 16 B cacheline : -config_l15_l1d_cacheline_size=16 
+
+> Note: By default the L1.5 & L1D cacheline size is 64B 
 > Note: if you would like to decrease the testbench monitor output to a minimum, append `-config_rtl=MINIMAL_MONITORING` to your build command in step 2. above.
 
 ==========================

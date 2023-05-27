@@ -41,51 +41,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `include "l15.tmp.h"
 
 //`default_nettype none
-module simplenocbuffer(
+module simplenocbuffer #(
+   parameter L15_L1D_LINE_SIZE = 64,
+   localparam L15_MAX_DATA_PACKETS = L15_L1D_LINE_SIZE/`NOC_BYTES_WIDTH,
+   localparam NOC2_MAX_FLIT_NUMBER = (`L1I_LINE_SIZE<L15_L1D_LINE_SIZE) ? (L15_MAX_DATA_PACKETS + 1) : (4+1) //Data packets + header
+) (
    input wire clk,
    input wire rst_n,
    input wire noc_in_val,
    input wire [`NOC_DATA_WIDTH-1:0] noc_in_data,
    input wire msg_ack,
    output reg noc_in_rdy,
-   output reg [511:0] msg,
+   output reg [64*NOC2_MAX_FLIT_NUMBER-1:0] msg,
    output reg msg_val
    );
 
-reg [2:0] index;
-reg [2:0] index_next;
+localparam NOC2_MAX_FLIT_NUMBER_LOG2 = $clog2(NOC2_MAX_FLIT_NUMBER);
+
+integer i;
+reg [NOC2_MAX_FLIT_NUMBER_LOG2-1:0] index;
+reg [NOC2_MAX_FLIT_NUMBER_LOG2-1:0] index_next;
 reg [`MSG_LENGTH_WIDTH-1:0] msg_len;
 reg [`NOC2_STATE_WIDTH-1:0] state;
 reg [`NOC2_STATE_WIDTH-1:0] state_next;
-reg [`NOC_DATA_WIDTH-1:0] buffer [0:7];
-reg [`NOC_DATA_WIDTH-1:0] buffer_next [0:7];
+reg [`NOC_DATA_WIDTH-1:0] buffer [0:NOC2_MAX_FLIT_NUMBER-1];
+reg [`NOC_DATA_WIDTH-1:0] buffer_next [0:NOC2_MAX_FLIT_NUMBER-1];
 
 // Reset logic & sequential
 always @ (posedge clk)
 begin
+
    if (~rst_n)
    begin
-      buffer[0] <= 1'b0;
-      buffer[1] <= 1'b0;
-      buffer[2] <= 1'b0;
-      buffer[3] <= 1'b0;
-      buffer[4] <= 1'b0;
-      buffer[5] <= 1'b0;
-      buffer[6] <= 1'b0;
-      buffer[7] <= 1'b0;
+      for (i=0; i<NOC2_MAX_FLIT_NUMBER;i=i+1) begin
+         buffer[i] <= 1'b0;
+      end
       index <= 0;
       state <= 0;
    end
    else
    begin
-      buffer[0] <= buffer_next[0];
-      buffer[1] <= buffer_next[1];
-      buffer[2] <= buffer_next[2];
-      buffer[3] <= buffer_next[3];
-      buffer[4] <= buffer_next[4];
-      buffer[5] <= buffer_next[5];
-      buffer[6] <= buffer_next[6];
-      buffer[7] <= buffer_next[7];
+      for (i=0; i<NOC2_MAX_FLIT_NUMBER;i=i+1) begin
+         buffer[i] <= buffer_next[i];
+      end
       index <= index_next;
       state <= state_next;
    end
@@ -94,14 +92,9 @@ end
 // Combinational
 always @ *
 begin
-   msg[(0+1)*64 - 1 -: 64] = buffer[0];
-   msg[(1+1)*64 - 1 -: 64] = buffer[1];
-   msg[(2+1)*64 - 1 -: 64] = buffer[2];
-   msg[(3+1)*64 - 1 -: 64] = buffer[3];
-   msg[(4+1)*64 - 1 -: 64] = buffer[4];
-   msg[(5+1)*64 - 1 -: 64] = buffer[5];
-   msg[(6+1)*64 - 1 -: 64] = buffer[6];
-   msg[(7+1)*64 - 1 -: 64] = buffer[7];
+   for (i=0; i<NOC2_MAX_FLIT_NUMBER;i=i+1) begin
+         msg[(i+1)*64 - 1 -: 64] = buffer[i];
+   end
 end
 
 always @ *
@@ -110,14 +103,9 @@ begin
    state_next = 0;
    msg_val = 0;
    msg_len = 0;
-   buffer_next[0] = buffer[0];
-   buffer_next[1] = buffer[1];
-   buffer_next[2] = buffer[2];
-   buffer_next[3] = buffer[3];
-   buffer_next[4] = buffer[4];
-   buffer_next[5] = buffer[5];
-   buffer_next[6] = buffer[6];
-   buffer_next[7] = buffer[7];
+   for (i=0; i<NOC2_MAX_FLIT_NUMBER;i=i+1) begin
+      buffer_next[i] = buffer[i];
+   end
    noc_in_rdy = 1'b0;
 
    if (state == `NOC2_STATE_IDLE)

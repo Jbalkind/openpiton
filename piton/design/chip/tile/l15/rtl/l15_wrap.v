@@ -29,7 +29,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 `include "l15.tmp.h"
 
-module l15_wrap (
+module l15_wrap #(
+    parameter L15_L1D_LINE_SIZE = 64,
+    localparam L15_MAX_DATA_PACKETS = L15_L1D_LINE_SIZE/`NOC_BYTES_WIDTH,
+    localparam L1_MAX_DATA_PACKETS_BITS_WIDTH = (`L1I_LINE_SIZE<L15_L1D_LINE_SIZE) ? L15_MAX_DATA_PACKETS*`NOC_BITS_WIDTH : 4*`NOC_BITS_WIDTH
+)  (
     input                                   clk,
     input                                   rst_n,
 
@@ -61,10 +65,7 @@ module l15_wrap (
     output [`L15_THREADID_MASK]             l15_transducer_threadid,
     output                                  l15_transducer_prefetch,
     output                                  l15_transducer_f4b,
-    output [63:0]                           l15_transducer_data_0,
-    output [63:0]                           l15_transducer_data_1,
-    output [63:0]                           l15_transducer_data_2,
-    output [63:0]                           l15_transducer_data_3,
+    output [L1_MAX_DATA_PACKETS_BITS_WIDTH-1:0] l15_transducer_data,
     output                                  l15_transducer_inval_icache_all_way,
     output                                  l15_transducer_inval_dcache_all_way,
     output [15:4]                           l15_transducer_inval_address_15_4,
@@ -116,8 +117,10 @@ module l15_wrap (
     input  [`BIST_OP_WIDTH-1:0]             rtap_srams_bist_command,
     input  [`SRAM_WRAPPER_BUS_WIDTH-1:0]    rtap_srams_bist_data
 );
-
-    l15 l15 (
+ 
+    l15 #(
+      .L15_L1D_LINE_SIZE(L15_L1D_LINE_SIZE)
+    ) l15 (
         .clk(clk),
         .rst_n(rst_n),
 
@@ -150,10 +153,7 @@ module l15_wrap (
         .l15_transducer_threadid            (l15_transducer_threadid),
         .l15_transducer_prefetch            (l15_transducer_prefetch),
         .l15_transducer_f4b                 (l15_transducer_f4b),
-        .l15_transducer_data_0              (l15_transducer_data_0),
-        .l15_transducer_data_1              (l15_transducer_data_1),
-        .l15_transducer_data_2              (l15_transducer_data_2),
-        .l15_transducer_data_3              (l15_transducer_data_3),
+        .l15_transducer_data                (l15_transducer_data),
         .l15_transducer_inval_icache_all_way(l15_transducer_inval_icache_all_way),
         .l15_transducer_inval_dcache_all_way(l15_transducer_inval_dcache_all_way),
         .l15_transducer_inval_address_15_4  (l15_transducer_inval_address_15_4),

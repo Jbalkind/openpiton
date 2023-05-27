@@ -121,6 +121,8 @@ module l2_pipe1_ctrl(
     input wire l2_tag_hit_S2,
     input wire l2_evict_S2,
     input wire l2_wb_S2,
+    input wire l2_data_ack_l15line_64_S2,
+    input wire l2_data_ack_l15line_32_S2,
     input wire [`L2_MESI_BITS-1:0] l2_way_state_mesi_S2,
     input wire [`L2_VD_BITS-1:0] l2_way_state_vd_S2,
     input wire [`L2_DI_BIT-1:0] l2_way_state_cache_type_S2,
@@ -2359,17 +2361,17 @@ begin
     begin
         l2_load_data_subline_S2_next = `L2_DATA_SUBLINE_0;
     end
-    else if (valid_S2 && !(stall_real_S2) && (l2_ifill_32B_S2 || l2_load_noshare_32B_S2) && (l2_load_data_subline_S2_f == `L2_DATA_SUBLINE_1))
+    else if (valid_S2 && !(stall_real_S2) && (l2_ifill_32B_S2 || l2_load_noshare_32B_S2 || l2_data_ack_l15line_32_S2) && (l2_load_data_subline_S2_f == `L2_DATA_SUBLINE_1))
     begin
         l2_load_data_subline_S2_next = `L2_DATA_SUBLINE_0;
     end
-    else if (valid_S2 && !(stall_real_S2) && (l2_wb_S2 || l2_ifill_32B_S2 || l2_load_noshare_32B_S2 || l2_load_noshare_64B_S2))
+    else if (valid_S2 && !(stall_real_S2) && (l2_wb_S2 || l2_ifill_32B_S2 || l2_load_noshare_32B_S2 || l2_load_noshare_64B_S2 || l2_data_ack_l15line_64_S2 || l2_data_ack_l15line_32_S2))
     begin
-        l2_load_data_subline_S2_next = l2_load_data_subline_S2_f + 1;
+        l2_load_data_subline_S2_next = l2_load_data_subline_S2_f + 1; // for a 2-bit number, 3+1=0
     end
     else
     begin
-        l2_load_data_subline_S2_next = l2_load_data_subline_S2_f;
+        l2_load_data_subline_S2_next = l2_load_data_subline_S2_f; 
     end
 end
 
@@ -2380,10 +2382,21 @@ begin
 end
 
 reg stall_load_S2;
+reg msg_state_S4_f;
+localparam msg_state_0 = 1'b0;
+reg msg1_send_valid_S4;
 
 always @ *
 begin
-    if (l2_wb_S2 || l2_load_noshare_64B_S2)
+    if (l2_data_ack_l15line_64_S2) // if Stage 4 needs to send both DataAck and StoreMem, then we need 8 cycles totally
+    begin
+        stall_load_S2 = (l2_load_data_subline_S2_f != `L2_DATA_SUBLINE_3) || (msg_state_S4_f == msg_state_0 && msg1_send_valid_S4 && valid_S4);       
+    end
+    else if (l2_data_ack_l15line_32_S2)
+    begin
+        stall_load_S2 = (l2_load_data_subline_S2_f != `L2_DATA_SUBLINE_1) || (msg_state_S4_f == msg_state_0 && msg1_send_valid_S4 && valid_S4) ;
+    end
+    else if (l2_wb_S2 || l2_load_noshare_64B_S2)
     begin
         stall_load_S2 = (l2_load_data_subline_S2_f != `L2_DATA_SUBLINE_3);
     end
@@ -2451,6 +2464,8 @@ reg [`L2_MSHR_STATE_BITS-1:0] mshr_state_in_S3_f;
 reg [`L2_MSHR_INDEX_WIDTH-1:0] mshr_pending_index_S3_f;
 reg special_addr_type_S3_f;
 reg req_recycle_S3_f;
+reg l2_data_ack_l15line_64_S3_f;
+reg l2_data_ack_l15line_32_S3_f;
 
 always @ (posedge clk)
 begin
@@ -2474,6 +2489,8 @@ begin
         mshr_pending_index_S3_f <= 0;
         special_addr_type_S3_f <= 0;
         req_recycle_S3_f <= 0;
+        l2_data_ack_l15line_64_S3_f <= 0;
+        l2_data_ack_l15line_32_S3_f <= 0;
     end
     else if (!stall_S3)
     begin
@@ -2495,6 +2512,8 @@ begin
         mshr_pending_index_S3_f <= mshr_pending_index_S2_f;
         special_addr_type_S3_f <= special_addr_type_S2_f;
         req_recycle_S3_f <= req_recycle_S2;
+        l2_data_ack_l15line_32_S3_f <= l2_data_ack_l15line_32_S2;
+        l2_data_ack_l15line_64_S3_f <= l2_data_ack_l15line_64_S2;
     end
 end
 
@@ -2632,6 +2651,8 @@ reg [`L2_MSHR_INDEX_WIDTH-1:0] mshr_pending_index_S4_f;
 reg special_addr_type_S4_f;
 reg [`L2_DIR_ARRAY_WIDTH-1:0] dir_data_S4_f;
 reg req_recycle_S4_f;
+reg l2_data_ack_l15line_64_S4_f;
+reg l2_data_ack_l15line_32_S4_f;
 
 
 always @ (posedge clk)
@@ -2657,6 +2678,8 @@ begin
         special_addr_type_S4_f <= 0;
         dir_data_S4_f <= 0;
         req_recycle_S4_f <= 0;
+        l2_data_ack_l15line_64_S4_f <= 0;
+        l2_data_ack_l15line_32_S4_f <= 0;
     end
     else if (!stall_S4)
     begin
@@ -2679,6 +2702,8 @@ begin
         special_addr_type_S4_f <= special_addr_type_S3_f;
         dir_data_S4_f <= dir_data_S3;
         req_recycle_S4_f <= req_recycle_S3;
+        l2_data_ack_l15line_64_S4_f <= l2_data_ack_l15line_64_S3_f;
+        l2_data_ack_l15line_32_S4_f <= l2_data_ack_l15line_32_S3_f;
     end
 end
 
@@ -2707,7 +2732,7 @@ reg [`L2_ADDR_OP_WIDTH-1:0] addr_op_S4;
 
 reg msg0_send_valid_S4;
 reg [`MSG_TYPE_WIDTH-1:0] msg0_send_type_S4;
-reg msg1_send_valid_S4;
+//reg msg1_send_valid_S4;
 reg [`MSG_TYPE_WIDTH-1:0] msg1_send_type_S4;
 //reg msg_send_valid_pre_S4;
 //reg [`MSG_TYPE_WIDTH-1:0] msg_send_type_pre_S4;
@@ -3414,13 +3439,15 @@ begin
                      &&(msg1_send_type_S4 == `MSG_TYPE_STORE_MEM);
 end
 
-localparam msg_state_0 = 1'b0;
+//localparam msg_state_0 = 1'b0;
 localparam msg_state_1 = 1'b1;
 
-reg msg_state_S4_f;
+
+//reg msg_state_S4_f;
 reg msg_state_S4_next;
 
-
+// When we need to send two different messages, we send msg0 first, and then msg1. Use msg_state to control which msg to be sent
+// Basic Assumption: if we need to send 2 msgs, the first one is either DATAACK or LOADMEM
 `ifndef NO_RTL_CSM
 always @ *
 begin
@@ -3462,20 +3489,21 @@ begin
     else if (msg0_send_valid_S4 && msg1_send_valid_S4 && valid_S4
     && !(dir_data_stall_S4 || (msg_send_valid_S4 && !msg_send_ready_S4) || global_stall_S4))
     begin
-        if (msg_state_S4_f == msg_state_0)
+       if (msg_state_S4_f == msg_state_0 && (~l2_data_ack_l15line_64_S4_f && l2_load_data_subline_S4_f == `L2_DATA_SUBLINE_3))
         begin
             msg_state_S4_next = msg_state_1;
         end
+        else if (msg_state_S4_f == msg_state_0 && (~l2_data_ack_l15line_32_S4_f && l2_load_data_subline_S4_f == `L2_DATA_SUBLINE_1))
+        begin
+            msg_state_S4_next = msg_state_1;
+        end
+        else if (msg_state_S4_f == msg_state_1 && l2_load_data_subline_S4_f == `L2_DATA_SUBLINE_3)   
+        begin
+            msg_state_S4_next = msg_state_0;
+        end
         else
         begin
-            if (l2_load_data_subline_S4_f == `L2_DATA_SUBLINE_3)
-            begin
-                msg_state_S4_next = msg_state_0;
-            end
-            else
-            begin
-                msg_state_S4_next = msg_state_1;
-            end
+            msg_state_S4_next = msg_state_S4_f;
         end
     end
     else
@@ -3583,12 +3611,6 @@ begin
     smc_stall_S4 = smc_rd_en_S4 && (smc_state_S4_f == smc_state_0);
 end
 `endif
-/*
-always @ *
-begin
-    msg_send_valid_S4 = msg_send_valid_pre_S4 && (~smc_stall_S4);
-end
-*/
 
 reg [`L2_MSHR_INDEX_WIDTH-1:0] mshr_empty_index_buf_S4_f;
 reg [`L2_MSHR_INDEX_WIDTH-1:0] mshr_empty_index_buf_S4_next;
@@ -3721,13 +3743,29 @@ begin
                     msg_send_mode_S4 = `L2_P1_BUF_OUT_MODE_0H2D;
                 end
             end
-            else if (cache_type_S4_f == `MSG_CACHE_TYPE_DATA)
+            if (cache_type_S4_f == `MSG_CACHE_TYPE_DATA && 
+                ((msg_type_S4 >= `MSG_TYPE_AMO_ADD_P1_REQ && msg_type_S4 <= `MSG_TYPE_AMO_MINU_P1_REQ) ||  msg_type_S4 == `MSG_TYPE_LR_REQ || msg_type_S4 == `MSG_TYPE_SWAP_P1_REQ || msg_type_S4 == `MSG_TYPE_NC_LOAD_REQ || msg_type_S4 == `MSG_TYPE_NC_STORE_REQ ))
             begin
                 msg_send_mode_S4 = `L2_P1_BUF_OUT_MODE_1H2D;
                 msg_send_length_S4 = `MSG_LENGTH_WIDTH'd2;
                 // msg_send_data_size_S4 = `MSG_DATA_SIZE_16B;
                 msg_send_cache_type_S4 = cache_type_S4_f;
                 msg_send_mshrid_S4 = mshrid_S4;
+            end
+            else if (cache_type_S4_f == `MSG_CACHE_TYPE_DATA)
+            begin
+                msg_send_length_S4 = (data_size_S4_f == `MSG_DATA_SIZE_64B) ? 4'b1000 : (data_size_S4_f == `MSG_DATA_SIZE_32B) ? 3'b100 : 2'b10; //Num of data flits 
+                msg_send_data_size_S4 = data_size_S4_f;
+                msg_send_cache_type_S4 = cache_type_S4_f;
+                msg_send_mshrid_S4 = mshrid_S4; 
+                if (l2_load_data_subline_S4_f == `L2_DATA_SUBLINE_0)
+                begin
+                    msg_send_mode_S4 = `L2_P1_BUF_OUT_MODE_1H2D;
+                end
+                else
+                begin
+                    msg_send_mode_S4 = `L2_P1_BUF_OUT_MODE_0H2D;
+                end
             end
             else
             begin
@@ -3896,11 +3934,11 @@ begin
     l2_miss_valid_S4 = l2_access_valid_S4 && msg_send_l2_miss_S4;
 end
 
-
+// The only situation is msg0 = LoadMem, msg1 = StoreMem
 always @ *
 begin
     msg_stall_S4 = msg0_send_valid_S4 && msg1_send_valid_S4
-               && (msg_state_S4_f == msg_state_0);
+               && (msg_state_S4_f == msg_state_0) && !l2_data_ack_l15line_64_S4_f && !l2_data_ack_l15line_32_S4_f; 
 end
 
 

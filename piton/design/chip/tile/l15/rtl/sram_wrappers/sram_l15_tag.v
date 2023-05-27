@@ -1,3 +1,4 @@
+
 /*
 Copyright (c) 2015 Princeton University
 All rights reserved.
@@ -25,94 +26,92 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
-//==================================================================================================
-//  Filename      : rf_l15_lruarray.v
-//  Created On    : 2014-02-04 18:14:58
-//  Last Modified : 2014-02-13 18:30:34
-//  Revision      :
-//  Author        : Tri Nguyen
-//  Company       : Princeton University
-//  Email         : trin@princeton.edu
-//
-//  Description   :
-//
-//
-//==================================================================================================
-//rf_l15_lruarray.v
+// 02/06/2015 14:58:59
+// Author: Tri Nguyen
 
 `include "l15.tmp.h"
-<%
-  import pyhplib
-  from pyhplib import * 
-%>
-//`timescale 1 ns / 10 ps
-//`default_nettype none
+`include "define.tmp.h"
 
-module rf_l15_lruarray #(
+`ifdef DEFAULT_NETTYPE_NONE
+`default_nettype none
+`endif
+
+module sram_l15_tag #(
    parameter L15_L1D_LINE_SIZE = 64, 
    localparam L15_NUM_ENTRIES = `CONFIG_L15_SIZE/L15_L1D_LINE_SIZE,
    localparam L15_CACHE_INDEX_WIDTH = $clog2(L15_NUM_ENTRIES) - 2
 
-) (
-   input wire clk,
-   input wire rst_n,
-
-   input wire read_valid,
-   input wire [L15_CACHE_INDEX_WIDTH-1:0] read_index,
-
-   input wire write_valid,
-   input wire [L15_CACHE_INDEX_WIDTH-1:0] write_index,
-   input wire [5:0] write_mask,
-   input wire [5:0] write_data,
-
-   output wire [5:0] read_data
-   );
-
-<%
-   linesize = 16
-   numset = int(int(CONFIG_L15_SIZE)/int(CONFIG_L15_ASSOCIATIVITY)/linesize)
-%>
+)
+(
+input wire MEMCLK,
+input wire RESET_N,
+input wire CE,
+input wire [L15_CACHE_INDEX_WIDTH-1:0] A,
+input wire RDWEN,
+input wire [`L15_CACHE_TAG_RAW_SRAM_WIDTH-1:0] BW,
+input wire [`L15_CACHE_TAG_RAW_SRAM_WIDTH-1:0] DIN,
+output wire [`L15_CACHE_TAG_RAW_SRAM_WIDTH-1:0] DOUT,
+input wire [`BIST_OP_WIDTH-1:0] BIST_COMMAND,
+input wire [`SRAM_WRAPPER_BUS_WIDTH-1:0] BIST_DIN,
+output reg [`SRAM_WRAPPER_BUS_WIDTH-1:0] BIST_DOUT,
+input wire [`BIST_ID_WIDTH-1:0] SRAMID
+);
 
 localparam L15_CACHE_INDEX_VECTOR_WIDTH = L15_NUM_ENTRIES/4;
 
 
-// reg read_valid_f;
-reg [L15_CACHE_INDEX_WIDTH-1:0] read_index_f;
+`ifdef SYNTHESIZABLE_BRAM
+wire [`L15_CACHE_TAG_RAW_SRAM_WIDTH-1:0] DOUT_bram;
+assign DOUT = DOUT_bram;
 
-reg [5:0] regfile [0:L15_CACHE_INDEX_VECTOR_WIDTH-1];
+bram_1rw_wrapper #(
+   .NAME          (""             ),
+   .DEPTH         (L15_CACHE_INDEX_VECTOR_WIDTH),
+   .ADDR_WIDTH    (L15_CACHE_INDEX_WIDTH),
+   .BITMASK_WIDTH (`L15_CACHE_TAG_RAW_SRAM_WIDTH),
+   .DATA_WIDTH    (`L15_CACHE_TAG_RAW_SRAM_WIDTH)
+)   sram_l15_tag (
+   .MEMCLK        (MEMCLK     ),
+   .RESET_N        (RESET_N     ),
+   .CE            (CE         ),
+   .A             (A          ),
+   .RDWEN         (RDWEN      ),
+   .BW            (BW         ),
+   .DIN           (DIN        ),
+   .DOUT          (DOUT_bram       )
+);
+      
+`else
 
-always @ (posedge clk)
+reg [`L15_CACHE_TAG_RAW_SRAM_WIDTH-1:0] cache [L15_CACHE_INDEX_VECTOR_WIDTH-1:0];
+
+integer i;
+initial
 begin
-   if (!rst_n)
+   for (i = 0; i < L15_CACHE_INDEX_VECTOR_WIDTH; i = i + 1)
    begin
-      read_index_f <= 0;
+      cache[i] = 0;
    end
-   else
-   if (read_valid)
-      read_index_f <= read_index;
-   else
-      read_index_f <= read_index_f;
 end
 
-// read port
-assign read_data = regfile[read_index_f];
 
-// Write port
-always @ (posedge clk)
+
+reg [`L15_CACHE_TAG_RAW_SRAM_WIDTH-1:0] dout_f;
+
+assign DOUT = dout_f;
+
+always @ (posedge MEMCLK)
 begin
-   if (!rst_n)
+   if (CE)
    begin
-      <%
-         for i in range (numset):
-            print("regfile[%d] <= 6'b0;" % (i))
-      %>
-      // regfile <= 1024'b0;
-   end
-   else
-   if (write_valid)
-   begin
-      regfile[write_index] <= (write_data & write_mask) | (regfile[write_index] & ~write_mask);
+      if (RDWEN == 1'b0)
+         cache[A] <= (DIN & BW) | (cache[A] & ~BW);
+      else
+         dout_f <= cache[A];
    end
 end
-endmodule
+
+`endif 
+
+ endmodule
+

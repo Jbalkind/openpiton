@@ -4,6 +4,10 @@ description: Top-level L15 cache SRAM wrappers
 
 filesets:
     rtl:
+        files:
+            - sram_l15_data.v
+            - sram_l15_hmt.v
+            - sram_l15_tag.v
         depend:
             - openpiton::piton_include
             - openpiton::preprocessor
@@ -14,10 +18,3 @@ targets:
         filesets: [rtl]
         generate: [pyhp_preprocess]
 
-generate:
-    pyhp_preprocess:
-        generator: pyhp_preprocess_gen
-        parameters:
-            process_me : [[sram_l15_data.v.pyv, sram_l15_data.tmp.v],
-                          [sram_l15_hmt.v.pyv, sram_l15_hmt.tmp.v],
-                          [sram_l15_tag.v.pyv, sram_l15_tag.tmp.v]]

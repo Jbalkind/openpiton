@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `ifndef L15_H
 `define L15_H
 
-// `define L15_CACHELINE_WIDTH 128
 `define L15_HMT_ENTRY_WIDTH 32
 
 `define L15_UNPARAM_1_0 1:0
@@ -42,8 +41,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `define L15_UNPARAM_5_0 5:0
 `define L15_UNPARAM_11_0 11:0
 `define L15_UNPARAM_15_0 15:0
+
 `define L15_UNPARAM_63_0 63:0
+`define L15_UNPARAM_127_64 127:64
+`define L15_UNPARAM_191_128 191:128
+`define L15_UNPARAM_255_192 255:192
+`define L15_UNPARAM_319_256 319:256
+`define L15_UNPARAM_383_320 383:320
+`define L15_UNPARAM_447_384 447:384
+`define L15_UNPARAM_511_448 511:448
+
 `define L15_UNPARAM_127_0 127:0
+`define L15_UNPARAM_255_128 255:128
+`define L15_UNPARAM_383_256 383:256
+`define L15_UNPARAM_511_384 511:384
 
 `define L15_PADDR_HI 39
 `define L15_PADDR_WIDTH 40
@@ -57,7 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    if 'PITON_ARIANE' in globals():
        print("// this is used in the ariane SV packages to derive the parameterization")
-       print("`define CONFIG_L1D_CACHELINE_WIDTH %d"  % 128) # constant at the moment
+       print("`define CONFIG_L1D_CACHELINE_WIDTH %d"  % (PITON_L15_L1D_LINE_SIZE*8)) 
        print("`define CONFIG_L1I_CACHELINE_WIDTH %d"  % 256) # constant at the moment
        print("`define CONFIG_L15_SIZE %d"             % CONFIG_L15_SIZE)
        print("`define CONFIG_L1D_SIZE %d"             % CONFIG_L1D_SIZE)
@@ -65,27 +76,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
        print("`define CONFIG_L15_ASSOCIATIVITY %d"    % CONFIG_L15_ASSOCIATIVITY)
        print("`define CONFIG_L1D_ASSOCIATIVITY %d"    % CONFIG_L1D_ASSOCIATIVITY)
        print("`define CONFIG_L1I_ASSOCIATIVITY %d"    % CONFIG_L1I_ASSOCIATIVITY)
+       print("`define NOC_BITS_WIDTH %d" % 64)
+       print("`define NOC_BYTES_WIDTH %d" % 8)
        print("\n\n")
 
-   # 512
-   numentries = CONFIG_L15_SIZE / L15_LINE_SIZE
-   # 512
-   print("`define L15_NUM_ENTRIES %d" % numentries)
-   # 9
-   print("`define L15_NUM_ENTRIES_LOG2 %d" % int(math.log(numentries, 2)))
+   #Fix array size to 16B 
+   l15_data_array_size = 16  
+   print("`define L1I_LINE_SIZE %d" % 32) #Harcoded to 32B 
+   print("`define L1D_MAX_DATA_PACKETS `CONFIG_L1D_CACHELINE_WIDTH/`NOC_BITS_WIDTH")
+   print("`define L1_MAX_DATA_PACKETS ((`CONFIG_L1D_CACHELINE_WIDTH > `CONFIG_L1I_CACHELINE_WIDTH) ? `L1D_MAX_DATA_PACKETS : 4)")
+   print("`define L1_MAX_DATA_PACKETS_BITS_WIDTH (`L1_MAX_DATA_PACKETS * `NOC_BITS_WIDTH)")
+   print("`define L15_DATA_ARRAY_SIZE %d" % l15_data_array_size )
+   print("`define L15_DATA_ARRAY_SIZE_WIDTH %d" % math.log(l15_data_array_size, 2) )
    # 4
    print("`define L15_WAY_COUNT %d" % CONFIG_L15_ASSOCIATIVITY)
    # 2
    print("`define L15_WAY_WIDTH %d" % int(math.log(CONFIG_L15_ASSOCIATIVITY, 2)))
-
-   l15_set_count = numentries / CONFIG_L15_ASSOCIATIVITY
-   l1d_set_count = CONFIG_L1D_SIZE / L15_LINE_SIZE / CONFIG_L1D_ASSOCIATIVITY
-   if l15_set_count > l1d_set_count:
-      print("`define L15_WMT_EXTENDED_ALIAS")
-      print("`define L15_WMT_ALIAS_WIDTH %d" % int(math.log(l15_set_count/l1d_set_count, 2)))
-
-   print("`define L15_CACHELINE_WIDTH %d" % (L15_LINE_SIZE*8))
 %>
+
+// cache size can be 64B, 512 bits, but array width is kept 16B(128 bits), and 4 array items form a cacheline 
+`define L15_SUBLINE_0 2'd0
+`define L15_SUBLINE_1 2'd1
+`define L15_SUBLINE_2 2'd2
+`define L15_SUBLINE_3 2'd3
+`define L15_DATA_ARRAY_WIDTH (`L15_DATA_ARRAY_SIZE * 8)
+`define L15_SUBLINE_MASK 5:4
 
 `define L15_MESI_STATE_WIDTH 2
 `define L15_MESI_STATE_I 2'd0
@@ -118,68 +133,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `define L15_WAYID_WAY6 `L15_WAY_WIDTH'd6
 `define L15_WAYID_WAY7 `L15_WAY_WIDTH'd7
 
-// 7
-`define L15_NUM_4WAY_ENTRIES_LOG2 (`L15_NUM_ENTRIES_LOG2-2)
-// 7
-`define L15_CACHE_INDEX_WIDTH (`L15_NUM_4WAY_ENTRIES_LOG2)
-`define L15_CACHE_INDEX_MASK `L15_CACHE_INDEX_WIDTH-1:0
-`define L15_CACHE_INDEX_VECTOR_WIDTH (`L15_NUM_ENTRIES/4)
-
-// 16B cache lines
-`define L15_IDX_LOW 4
-// 10
-`define L15_IDX_HI (`L15_CACHE_INDEX_WIDTH+`L15_IDX_LOW-1)
-
 `define L15_CACHE_TAG_RAW_WIDTH 33
 `define L15_CACHE_TAG_RAW_SRAM_WIDTH 33*`L15_WAY_COUNT
-// 40 - 4 (16B line) - 7 (index width) = 29
-`define L15_CACHE_TAG_WIDTH (`L15_PADDR_WIDTH - 4 - `L15_CACHE_INDEX_WIDTH)
-// 11
-`define L15_CACHE_TAG_LOW (`L15_IDX_HI + 1)
 // 39
 `define L15_CACHE_TAG_HI (`L15_PADDR_HI)
-
-// this need to be defined when L1.5 has more sets than L1D
-// for correct operations
-// `define L15_WMT_EXTENDED_ALIAS
-
-`ifdef L15_WMT_EXTENDED_ALIAS
-// `define L15_WMT_ALIAS_WIDTH 4
-// `define L15_WMT_ALIAS_LOW `L1D_SET_IDX_HI+1
-`define L15_WMT_ALIAS_LOW `L1D_ADDRESS_HI+1
-// `define L15_WMT_ALIAS_HI `L15_WMT_ALIAS_LOW + `L15_WMT_ALIAS_WIDTH - 1
-`define L15_WMT_ALIAS_HI `L15_WMT_ALIAS_LOW + `L15_WMT_ALIAS_WIDTH - 1
-`define L15_WMT_ALIAS_MASK `L15_WMT_ALIAS_HI:`L15_WMT_ALIAS_LOW
-`else
-`define L15_WMT_ALIAS_WIDTH 0
-`endif
-
-`define L15_WMT_DATA_WIDTH (`L15_WAY_WIDTH+`L15_WMT_ALIAS_WIDTH)
-`define L15_WMT_DATA_MASK `L15_WMT_DATA_WIDTH-1:0
-`define L15_WMT_VALID_MASK `L15_WMT_DATA_WIDTH
-`define L15_WMT_ENTRY_WIDTH (`L15_WMT_DATA_WIDTH+1)
-`define L15_WMT_ENTRY_MASK `L15_WMT_ENTRY_WIDTH-1:0
-
-// `define L15_WMT_ENTRY_0_MASK 1*`L15_WMT_ENTRY_WIDTH-1 -: `L15_WMT_ENTRY_WIDTH
-// `define L15_WMT_ENTRY_1_MASK 2*`L15_WMT_ENTRY_WIDTH-1 -: `L15_WMT_ENTRY_WIDTH
-// `define L15_WMT_ENTRY_2_MASK 3*`L15_WMT_ENTRY_WIDTH-1 -: `L15_WMT_ENTRY_WIDTH
-// `define L15_WMT_ENTRY_3_MASK 4*`L15_WMT_ENTRY_WIDTH-1 -: `L15_WMT_ENTRY_WIDTH
-// `define L15_WMT_ENTRY_0_VALID_MASK 1*`L15_WMT_ENTRY_WIDTH-1
-// `define L15_WMT_ENTRY_1_VALID_MASK 2*`L15_WMT_ENTRY_WIDTH-1
-// `define L15_WMT_ENTRY_2_VALID_MASK 3*`L15_WMT_ENTRY_WIDTH-1
-// `define L15_WMT_ENTRY_3_VALID_MASK 4*`L15_WMT_ENTRY_WIDTH-1
-
-<%
-  template='''
-    `define L15_WMT_ENTRY___WAY_MASK (__WAY+1)*`L15_WMT_ENTRY_WIDTH-1 -: `L15_WMT_ENTRY_WIDTH
-    `define L15_WMT_ENTRY___WAY_VALID_MASK (__WAY+1)*`L15_WMT_ENTRY_WIDTH-1
-  '''
-  GenFor(template, CONFIG_L1D_ASSOCIATIVITY)
-%>
-
-`define L15_WMT_WIDTH `L1D_WAY_COUNT*`L15_WMT_ENTRY_WIDTH
-`define L15_WMT_MASK `L15_WMT_WIDTH-1:0
-`define L15_WMT_ENTRY_COUNT `L1D_SET_COUNT
 
 // LRU array storage
 // keeps 6 bits per cache set: 4 "used" bits, 1 each cache line, and 2 bits for wayid round robin (4w)
@@ -362,11 +319,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                         `L15_THREADID_WIDTH + \
                         `L15_WAY_WIDTH      + \
                         `TLB_CSM_WIDTH )
-
-`define L15_RTRN_WIDTH (16 + 4*64 + (15 - 4 + 1) + \
-                        `CPX_RESTYPE_WIDTH  +      \
-                        `L15_THREADID_WIDTH +      \
-                        2 * `L15_WAY_WIDTH)
 
 `define L15_FETCH_STATE_WIDTH 3
 `define L15_FETCH_STATE_NORMAL 3'd0
@@ -617,11 +569,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `define NOC3_REQ_HEADER_1 4'd0
 `define NOC3_REQ_HEADER_2 4'd1
 `define NOC3_REQ_HEADER_3 4'd2
-`define NOC3_REQ_DATA_1 4'd3
-`define NOC3_REQ_DATA_2 4'd4
 `define NOC3_RES_HEADER_1 4'd0
 `define NOC3_RES_DATA_1 4'd1
 `define NOC3_RES_DATA_2 4'd2
+`define NOC3_REQ_DATA_1 4'd3
+`define NOC3_REQ_DATA_2 4'd4
+`define NOC3_REQ_DATA_3 4'd5
+`define NOC3_REQ_DATA_4 4'd6
+`define NOC3_REQ_DATA_5 4'd7
+`define NOC3_REQ_DATA_6 4'd8
+`define NOC3_REQ_DATA_7 4'd9
+`define NOC3_REQ_DATA_8 4'd10
 
 // NOC2 BUFFER
 `define NOC2_STATE_WIDTH 2

@@ -17,6 +17,7 @@ filesets:
             - pcx_decoder.v
             - pico_decoder.v
             - simplenocbuffer.v
+            - rf_l15_wmt.v
         depend:
             - openpiton::piton_include
             - openpiton::piton_common
@@ -58,5 +59,4 @@ generate:
                           [noc1buffer.v.pyv, noc1buffer.tmp.v],
                           [rf_l15_lrsc_flag.v.pyv, rf_l15_lrsc_flag.tmp.v],
                           [rf_l15_lruarray.v.pyv, rf_l15_lruarray.tmp.v],
-                          [rf_l15_mesi.v.pyv, rf_l15_mesi.tmp.v],
-                          [rf_l15_wmt.v.pyv, rf_l15_wmt.tmp.v]]
+                          [rf_l15_mesi.v.pyv, rf_l15_mesi.tmp.v]]

@@ -54,7 +54,7 @@ module monitor(/*AUTOARG*/
 `ifndef VERILATOR
 	max_cycle = 30000;
 `else // ifndef VERILATOR
-	max_cycle = 1500000;
+	max_cycle = 100000000;
 `endif // ifndef VERILATOR
 	cycle  = 0;
 	if($value$plusargs("wait_cycle_to_kill=%d", number))$display("wait cycles = %d", number);

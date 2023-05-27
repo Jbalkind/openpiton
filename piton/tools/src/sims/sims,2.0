@@ -1516,7 +1516,7 @@ sub generic_sim_build
 	
     if ($opt{vlt_build}) {
       $build_cmd = "verilator -cc " ;
-      $build_cmd .= "-exe $dv_root/tools/verilator/my_top.cpp " ;
+      $build_cmd .= "-Os -trace -exe $dv_root/tools/verilator/my_top.cpp " ;
       $build_cmd .= "$dv_root/tools/pli/iop/b_ary.c " ;
       $build_cmd .= "$dv_root/tools/pli/iop/bw_lib.c " ;
       $build_cmd .= "$dv_root/tools/pli/iop/iob_main.cc " ;
@@ -2639,6 +2639,7 @@ sub parse_args
     "config_l15_associativity",
     "config_l2_size",
     "config_l2_associativity",
+    "config_l15_l1d_cacheline_size",
     );
 
   foreach my $config (@configurables) {

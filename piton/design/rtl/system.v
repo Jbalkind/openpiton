@@ -85,7 +85,7 @@
 //                              this is not set, a default "fake"
 //                              simulated DRAM is used.
 
-module system(
+module system (
 `ifndef PITON_FPGA_SYNTH
     // I/O settings
     input                                       chip_io_slew,

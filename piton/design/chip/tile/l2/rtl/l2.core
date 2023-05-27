@@ -9,7 +9,6 @@ filesets:
             - l2_amo_alu.v
             - l2_broadcast_counter.v
             - l2_broadcast_counter_wrap.v
-            - l2_config_regs.v
             - l2_data.v
             - l2_data_wrap.v
             - l2_decoder.v

@@ -248,6 +248,8 @@ module l2_pipe1_dpath(
     output reg l2_tag_hit_S2,
     output reg l2_evict_S2,
     output reg l2_wb_S2,
+    output reg l2_data_ack_l15line_64_S2,
+    output reg l2_data_ack_l15line_32_S2,
     output reg [`L2_MESI_BITS-1:0] l2_way_state_mesi_S2,
     output reg [`L2_VD_BITS-1:0] l2_way_state_vd_S2,
     output reg [`L2_DI_BIT-1:0] l2_way_state_cache_type_S2,
@@ -830,9 +832,9 @@ begin
     begin
         l2_wb_S2 = 1'b0;
     end
-    else if (((!l2_tag_hit_S2 && (msg_type_S2 != `MSG_TYPE_NC_STORE_REQ))
-           || (msg_type_S2 == `MSG_TYPE_NC_LOAD_REQ || msg_type_S2 == `MSG_TYPE_L2_DIS_FLUSH_REQ)
-           || (l2_tag_hit_S2 && msg_type_S2 == `MSG_TYPE_NC_STORE_REQ))
+    else if (( l2_evict_S2 || (l2_tag_hit_S2 && 
+    (msg_type_S2 == `MSG_TYPE_NC_LOAD_REQ || msg_type_S2 == `MSG_TYPE_NC_STORE_REQ || 
+     msg_type_S2 == `MSG_TYPE_L2_DIS_FLUSH_REQ || msg_type_S2 == `MSG_TYPE_L2_LINE_FLUSH_REQ)))
     && (state_way_S2[l2_way_sel_S2][`L2_STATE_MESI] == `L2_MESI_I)
     && (state_way_S2[l2_way_sel_S2][`L2_STATE_VD] == `L2_VD_DIRTY))
     begin
@@ -844,6 +846,28 @@ begin
     end
 end
 
+// TODO Need to consider all possible situations where we need to send dataACK to l15d
+// Three more conditions: Special_addr, NC_ld, Atomic_op
+always @ *
+begin
+    if ( (data_size_S2 == `MSG_DATA_SIZE_64B || data_size_S2 == `MSG_DATA_SIZE_32B) && (l2_tag_hit_S2 && !l2_ifill_32B_S2 && ( ( msg_type_S2 == `MSG_TYPE_LOAD_REQ && (l2_way_state_mesi_S2 == `L2_MESI_I ||
+                (l2_way_state_mesi_S2 == `L2_MESI_E && req_from_owner_S2 && cache_type_S2 == l2_way_state_cache_type_S2 ) || 
+                (l2_way_state_mesi_S2 == `L2_MESI_S && cache_type_S2 == l2_way_state_cache_type_S2 ) ||
+                (l2_way_state_mesi_S2 == `L2_MESI_B && cache_type_S2 == l2_way_state_cache_type_S2 ) ) ) ||
+            ( msg_type_S2 == `MSG_TYPE_STORE_REQ && (l2_way_state_mesi_S2 == `L2_MESI_I || 
+                (l2_way_state_mesi_S2 == `L2_MESI_E && req_from_owner_S2 && cache_type_S2 == l2_way_state_cache_type_S2 ) ) ) ) ) || 
+        ( (msg_type_S2 == `MSG_TYPE_L2_LINE_FLUSH_REQ || msg_type_S2 == `MSG_TYPE_L2_DIS_FLUSH_REQ) &&
+         !(l2_tag_hit_S2 && l2_way_state_mesi_S2 != `L2_MESI_I) ) )
+    begin
+        l2_data_ack_l15line_64_S2 =  (data_size_S2 == `MSG_DATA_SIZE_64B) ? 1'b1 : 1'b0; 
+        l2_data_ack_l15line_32_S2 =  (data_size_S2 == `MSG_DATA_SIZE_32B) ? 1'b1 : 1'b0; 
+    end
+    else
+    begin
+        l2_data_ack_l15line_64_S2 = 1'b0;
+        l2_data_ack_l15line_32_S2 = 1'b0;
+    end
+end
 
 reg [`L2_OWNER_BITS-1:0] l2_way_state_owner_S2;
 
@@ -880,11 +904,11 @@ end
 
 always @ *
 begin
-    if (l2_wb_S2 || l2_load_noshare_64B_S2)
+    if (l2_wb_S2 || l2_load_noshare_64B_S2 || l2_data_ack_l15line_64_S2)
     begin
         data_addr_S2 = {addr_S2_f[`L2_TAG_INDEX],l2_way_sel_S2, l2_load_data_subline_S2};
     end
-    else if (l2_ifill_32B_S2 || l2_load_noshare_32B_S2)
+    else if (l2_ifill_32B_S2 || l2_load_noshare_32B_S2 || l2_data_ack_l15line_32_S2)
     begin
         data_addr_S2 = {addr_S2_f[`L2_TAG_INDEX],l2_way_sel_S2,
                         addr_S2_f[`L2_INS_SUBLINE], l2_load_data_subline_S2[0]};
@@ -1208,6 +1232,14 @@ begin
     if (state_load_sdid_S2)
     begin
         state_subline_S2 = sdid_S2_f[`L2_STATE_SUBLINE];
+    end
+    else if (l2_data_ack_l15line_64_S2 && state_subline_op_S2 == `OP_ADD)
+    begin
+        state_subline_S2 = {`L2_SUBLINE_BITS{1'b1}};
+    end
+    else if (l2_data_ack_l15line_32_S2 && state_subline_op_S2 == `OP_ADD)
+    begin
+        state_subline_S2 = (addr_S2_f[`L2_INS_SUBLINE]==0) ? (l2_way_state_subline_S2 | 4'h3) : (l2_way_state_subline_S2 | 4'hc);
     end
     else if (state_subline_op_S2 == `OP_ADD)
     begin

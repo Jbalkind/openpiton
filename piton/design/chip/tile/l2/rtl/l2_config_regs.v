@@ -119,6 +119,20 @@ begin
     end
 end
 
+reg [1:0] cache_subline;
+always @ (posedge clk)
+begin
+
+    if (!rst_n || !l2_access_valid)
+    begin
+        cache_subline <= 0;
+    end
+    else if (l2_access_valid)
+    begin
+        cache_subline <= cache_subline + 1;
+    end
+end
+
 reg l2_access_counter_inc_en_f;
 always @ (posedge clk)
 begin
@@ -135,7 +149,7 @@ begin
     //     l2_access_counter_reg_f <= l2_access_counter_reg_f + 1;
     // end 
     // trin: pipeline addition for timing
-    l2_access_counter_inc_en_f <= l2_access_counter_inc_en && l2_access_valid;
+    l2_access_counter_inc_en_f <= l2_access_counter_inc_en && l2_access_valid && cache_subline==0; 
     if (l2_access_counter_inc_en_f) begin
         l2_access_counter_reg_f <= l2_access_counter_reg_f + 1;
     end
@@ -158,7 +172,7 @@ begin
     //     l2_miss_counter_reg_f <= l2_miss_counter_reg_f + 1;
     // end 
     // trin: pipeline addition for timing
-    l2_miss_counter_inc_en_f <= l2_miss_counter_inc_en && l2_miss_valid;
+    l2_miss_counter_inc_en_f <= l2_miss_counter_inc_en && l2_miss_valid && cache_subline==0;
     if (l2_miss_counter_inc_en_f) begin
         l2_miss_counter_reg_f <= l2_miss_counter_reg_f + 1;
     end

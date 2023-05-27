@@ -28,6 +28,8 @@
    from pyhplib import *
 
    linesize = 16
+   log2_linesize = math.ceil((math.log(int(linesize), 2)))
+
    # 512
    numentries = CONFIG_L1D_SIZE / linesize
    # 4
@@ -42,6 +44,9 @@
    print("`define L1D_WAY_COUNT %d" % way)
    # 2
    print("`define L1D_WAY_WIDTH %d" % waywidth)
+
+   # 10
+   print("`define L1D_ADDRESS_HI (`L1D_SET_IDX_HI + %d)" % int(log2_linesize))
 %>
 
 // 1:0
@@ -52,11 +57,7 @@
 // 32
 `define L1D_VAL_ARRAY_HI (4*`L1D_WAY_COUNT-1)
 `define L1D_VAL_SET_COUNT (`L1D_SET_COUNT/4)
-// 10
-`define L1D_ADDRESS_HI (`L1D_SET_IDX_HI + 4)
-// 7
-`define L1D_ADDRESS_WIDTH (`L1D_ADDRESS_HI - 4 + 1)
-`define L1D_SET_IDX_ (`L1D_SET_IDX_HI + 4)
+
 // 6:0
 `define L1D_SET_IDX_MASK `L1D_SET_IDX_HI:0
 `define L1D_SET_IDX_WIDTH (`L1D_SET_IDX_HI+1)

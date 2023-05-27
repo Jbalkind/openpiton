@@ -93,7 +93,8 @@ const char info[] = {
        int(os.environ['CONFIG_L15_SIZE'])/1024,
        int(os.environ['CONFIG_L15_ASSOCIATIVITY']),
        int(os.environ['CONFIG_L2_SIZE'] )/1024,
-       int(os.environ['CONFIG_L2_ASSOCIATIVITY'] ))
+       int(os.environ['CONFIG_L2_ASSOCIATIVITY']),
+       int(os.environ['CONFIG_L15_L1D_CACHELINE_SIZE']))
 
     with open(dtsPath + '/info.h','w') as file:
         file.write(tmpStr)

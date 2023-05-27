@@ -37,7 +37,9 @@ if PITON_RV64_PLATFORM:
 %>
 
 module tile #(
-     parameter TILE_TYPE = `SPARC_TILE
+    parameter TILE_TYPE = `SPARC_TILE,
+    parameter L15_L1D_LINE_SIZE = 64,
+    localparam L15_MAX_DATA_PACKETS = L15_L1D_LINE_SIZE/`NOC_BYTES_WIDTH
 ) (
     input                               clk,
     input                               rst_n,    // trin: assumed to be synchronous
@@ -191,6 +193,10 @@ print(s)
 `endif // ifdef PITON_RV64_PLIC
 `endif // ifdef PITON_RV64_PLATFORM
 );
+
+    localparam L1_MAX_DATA_PACKETS_BITS_WIDTH = (`L1I_LINE_SIZE<L15_L1D_LINE_SIZE) ? L15_MAX_DATA_PACKETS*`NOC_BITS_WIDTH : 4*`NOC_BITS_WIDTH;
+    localparam L15_RTRN_WIDTH = (16 + L1_MAX_DATA_PACKETS_BITS_WIDTH + (15 - 4 + 1) + `CPX_RESTYPE_WIDTH  + `L15_THREADID_WIDTH + 2 * `L15_WAY_WIDTH);
+
     // clock gating
     wire clk_gated;
     clk_gating_latch clk_gating_latch(
@@ -277,11 +283,11 @@ print(s)
     wire [4:0]                          transducer_pcx_grant;
     // is actually cpx_data_valid
     wire                                transducer_cpx_data_ready;
-    wire [144:0]                        transducer_cpx_data;
+    wire [`CPX_WIDTH-1:0]                        transducer_cpx_data;
 
     wire                                spc_grst_l;
     wire                                cpx_arb_spc_data_rdy;
-    wire [144:0]                        cpx_arb_spc_data;
+    wire [`CPX_WIDTH-1:0]               cpx_arb_spc_data;
     wire [4:0]                          cpx_arb_spc_grant;
 
     wire [`PCX_REQTYPE_WIDTH-1:0]       transducer_l15_rqtype;
@@ -313,10 +319,7 @@ print(s)
     wire [`L15_THREADID_MASK]           l15_transducer_threadid;
     wire                                l15_transducer_prefetch;
     wire                                l15_transducer_f4b;
-    wire [63:0]                         l15_transducer_data_0;
-    wire [63:0]                         l15_transducer_data_1;
-    wire [63:0]                         l15_transducer_data_2;
-    wire [63:0]                         l15_transducer_data_3;
+    wire [L1_MAX_DATA_PACKETS_BITS_WIDTH-1:0] l15_transducer_data;
     wire                                l15_transducer_inval_icache_all_way;
     wire                                l15_transducer_inval_dcache_all_way;
     wire [15:4]                         l15_transducer_inval_address_15_4;
@@ -801,10 +804,10 @@ if (TILE_TYPE == `SPARC_TILE) begin : g_sparc_core
         .l15_transducer_threadid            (l15_transducer_threadid),
         .l15_transducer_prefetch            (l15_transducer_prefetch),
         .l15_transducer_f4b                 (l15_transducer_f4b),
-        .l15_transducer_data_0              (l15_transducer_data_0),
-        .l15_transducer_data_1              (l15_transducer_data_1),
-        .l15_transducer_data_2              (l15_transducer_data_2),
-        .l15_transducer_data_3              (l15_transducer_data_3),
+        .l15_transducer_data_0              (l15_transducer_data[`L15_UNPARAM_63_0]),
+        .l15_transducer_data_1              (l15_transducer_data[`L15_UNPARAM_127_64],
+        .l15_transducer_data_2              (l15_transducer_data[`L15_UNPARAM_191_128]),
+        .l15_transducer_data_3              (l15_transducer_data[`L15_UNPARAM_254_192]),
         .l15_transducer_inval_icache_all_way(l15_transducer_inval_icache_all_way),
         .l15_transducer_inval_dcache_all_way(l15_transducer_inval_dcache_all_way),
         .l15_transducer_inval_address_15_4  (l15_transducer_inval_address_15_4),
@@ -890,8 +893,8 @@ if (TILE_TYPE == `PICORV32_TILE) begin : g_picorv32_core
         .l15_transducer_val                 (l15_transducer_val),
         .l15_transducer_returntype          (l15_transducer_returntype),
 
-        .l15_transducer_data_0              (l15_transducer_data_0),
-        .l15_transducer_data_1              (l15_transducer_data_1),
+        .l15_transducer_data_0              (l15_transducer_data[`L15_UNPARAM_63_0]),
+        .l15_transducer_data_1              (l15_transducer_data[`L15_UNPARAM_127_64]),
 
         .transducer_pico_mem_ready          (transducer_pico_mem_ready),
         .transducer_pico_mem_rdata          (transducer_pico_mem_rdata),
@@ -915,10 +918,10 @@ if (TILE_TYPE == `ARIANE_RV64_TILE) begin : g_ariane_core
 
     // native L15 interface, used in case of ARIANE_RV64, otherwise tied to zero
     wire [`L15_REQ_WIDTH-1:0]  l15_req;
-    wire [`L15_RTRN_WIDTH-1:0] l15_rtrn;
+    wire [L15_RTRN_WIDTH-1:0] l15_rtrn;
 
-    // see serpent_cache_pkg.sv for definition of the packed struct type "l15_rtrn_t",
-    // note that the constants defined in l15.tmp.h and serpent_cache_pkg.sv need to coincide!
+    // see wt_cache_pkg.sv for definition of the packed struct type "l15_rtrn_t",
+    // note that the constants defined in l15.tmp.h and wt_cache_pkg.sv need to coincide!
     assign l15_rtrn = { l15_transducer_ack,
                         l15_transducer_header_ack,
                         l15_transducer_val,
@@ -930,10 +933,7 @@ if (TILE_TYPE == `ARIANE_RV64_TILE) begin : g_ariane_core
                         l15_transducer_threadid,
                         l15_transducer_prefetch,
                         l15_transducer_f4b,
-                        l15_transducer_data_0,
-                        l15_transducer_data_1,
-                        l15_transducer_data_2,
-                        l15_transducer_data_3,
+                        l15_transducer_data,
                         l15_transducer_inval_icache_all_way,
                         l15_transducer_inval_dcache_all_way,
                         l15_transducer_inval_address_15_4,
@@ -945,8 +945,8 @@ if (TILE_TYPE == `ARIANE_RV64_TILE) begin : g_ariane_core
                         l15_transducer_blockinitstore };
 
     wire [2:0] transducer_l15_size_pcx_standard;
-    // see serpent_cache_pkg.sv for definition of the packed struct type "l15_req_t",
-    // note that the constants defined in l15.tmp.h and serpent_cache_pkg.sv need to coincide!
+    // see wt_cache_pkg.sv for definition of the packed struct type "l15_req_t",
+    // note that the constants defined in l15.tmp.h and wt_cache_pkg.sv need to coincide!
     assign { transducer_l15_val,
              transducer_l15_req_ack,
              transducer_l15_rqtype,
@@ -971,8 +971,9 @@ if (TILE_TYPE == `ARIANE_RV64_TILE) begin : g_ariane_core
                                     (transducer_l15_size_pcx_standard == `PCX_SZ_4B) ? `MSG_DATA_SIZE_4B : 
                                     (transducer_l15_size_pcx_standard == `PCX_SZ_8B) ? `MSG_DATA_SIZE_8B : 
                                     (transducer_l15_size_pcx_standard == `PCX_SZ_16B && 
-                                     transducer_l15_rqtype == `PCX_REQTYPE_IFILL && 
-                                    ~transducer_l15_invalidate_cacheline) ? `MSG_DATA_SIZE_32B : `MSG_DATA_SIZE_16B; 
+                                     ((transducer_l15_rqtype == `PCX_REQTYPE_IFILL && 
+                                    ~transducer_l15_invalidate_cacheline) || L15_L1D_LINE_SIZE==32)) ? `MSG_DATA_SIZE_32B : 
+                                    (transducer_l15_size_pcx_standard == `PCX_SZ_16B && L15_L1D_LINE_SIZE==64) ? `MSG_DATA_SIZE_64B : `MSG_DATA_SIZE_16B;
 
     wire [63:0] ariane_bootaddr;
 
@@ -1076,7 +1077,9 @@ print(str)
     // L1.5 //
     //////////
 
-    l15_wrap l15(
+    l15_wrap #(
+      .L15_L1D_LINE_SIZE(L15_L1D_LINE_SIZE)
+    ) l15(
         .clk(clk_gated),
         .rst_n(spc_grst_l),
 
@@ -1109,10 +1112,7 @@ print(str)
         .l15_transducer_threadid            (l15_transducer_threadid),
         .l15_transducer_prefetch            (l15_transducer_prefetch),
         .l15_transducer_f4b                 (l15_transducer_f4b),
-        .l15_transducer_data_0              (l15_transducer_data_0),
-        .l15_transducer_data_1              (l15_transducer_data_1),
-        .l15_transducer_data_2              (l15_transducer_data_2),
-        .l15_transducer_data_3              (l15_transducer_data_3),
+        .l15_transducer_data                (l15_transducer_data),
         .l15_transducer_inval_icache_all_way(l15_transducer_inval_icache_all_way),
         .l15_transducer_inval_dcache_all_way(l15_transducer_inval_dcache_all_way),
         .l15_transducer_inval_address_15_4  (l15_transducer_inval_address_15_4),

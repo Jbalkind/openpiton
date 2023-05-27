@@ -46,19 +46,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // 12/17 timing fix: move write to s3
 
+`include "l15.tmp.h"
+
 <%
   import pyhplib
   from pyhplib import * 
 %>
-module rf_l15_mesi(
+module rf_l15_mesi #(
+   parameter L15_L1D_LINE_SIZE = 64, 
+   localparam L15_NUM_ENTRIES = `CONFIG_L15_SIZE/L15_L1D_LINE_SIZE,
+   localparam L15_CACHE_INDEX_WIDTH = $clog2(L15_NUM_ENTRIES) - 2
+
+)(
    input wire clk,
    input wire rst_n,
 
    input wire read_valid,
-   input wire [`L15_CACHE_INDEX_WIDTH-1:0] read_index,
+   input wire [L15_CACHE_INDEX_WIDTH-1:0] read_index,
 
    input wire write_valid,
-   input wire [`L15_CACHE_INDEX_WIDTH-1:0] write_index,
+   input wire [L15_CACHE_INDEX_WIDTH-1:0] write_index,
    input wire [7:0] write_mask,
    input wire [7:0] write_data,
 
@@ -70,14 +77,16 @@ module rf_l15_mesi(
    numset = int(int(CONFIG_L15_SIZE)/int(CONFIG_L15_ASSOCIATIVITY)/linesize)
 %>
 
+localparam L15_CACHE_INDEX_VECTOR_WIDTH = L15_NUM_ENTRIES/4;
+
 // reg read_valid_f;
-reg [`L15_CACHE_INDEX_WIDTH-1:0] read_index_f;
-reg [`L15_CACHE_INDEX_WIDTH-1:0] write_index_f;
+reg [L15_CACHE_INDEX_WIDTH-1:0] read_index_f;
+reg [L15_CACHE_INDEX_WIDTH-1:0] write_index_f;
 reg [7:0] write_data_f;
 reg [7:0] write_mask_f;
 reg write_valid_f;
 
-reg [7:0] regfile [0:`L15_CACHE_INDEX_VECTOR_WIDTH-1];
+reg [7:0] regfile [0:L15_CACHE_INDEX_VECTOR_WIDTH-1];
 
 always @ (posedge clk)
 begin

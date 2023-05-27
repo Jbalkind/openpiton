@@ -700,7 +700,9 @@ end
 
 `ifndef PITON_BOARD
     `ifndef PITONSYS_INC_PASSTHRU
+    `ifndef PITON_NO_CHIP_BRIDGE
         assign io_clk_loopback = io_clk;
+    `endif
     `endif
 
     `ifdef PITON_CLKS_CHIPSET

@@ -43,14 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `ifdef DEFAULT_NETTYPE_NONE
 `default_nettype none // DEFAULT_NETTYPE_NONE
 `endif
-module noc3encoder(
+module noc3encoder #(
+    parameter L15_L1D_LINE_SIZE = 64
+) (
     input wire clk,
     input wire rst_n,
 
     input wire l15_noc3encoder_req_val,
     input wire [`L15_NOC3_REQTYPE_WIDTH-1:0] l15_noc3encoder_req_type,
-    input wire [63:0] l15_noc3encoder_req_data_0,
-    input wire [63:0] l15_noc3encoder_req_data_1,
+    input wire [(L15_L1D_LINE_SIZE*8)-1:0] l15_noc3encoder_req_data,
     input wire [`L15_MSHR_ID_WIDTH-1:0] l15_noc3encoder_req_mshrid,
     input wire [`L15_THREADID_MASK] l15_noc3encoder_req_threadid,
     input wire [1:0] l15_noc3encoder_req_sequenceid,
@@ -72,6 +73,7 @@ module noc3encoder(
     output reg [63:0] noc3encoder_noc3out_data
    );
 
+localparam L15_MAX_DATA_PACKETS = L15_L1D_LINE_SIZE/`NOC_BYTES_WIDTH;
 
 reg [63:0] flit;
 reg [`NOC3_FLIT_STATE_WIDTH-1:0] flit_state;
@@ -110,25 +112,34 @@ reg [1:0] last_subcacheline_id;
 // 9/24/14: add buffer between dcache and output
 reg [63:0] l15_noc3encoder_req_data_0_f;
 // reg [63:0] l15_noc3encoder_req_data_1_f;
+integer n_data_packet;
 always @ (posedge clk)
 begin
     if (!rst_n)
     begin
         l15_noc3encoder_req_data_0_f <= 0;
-        // l15_noc3encoder_req_data_1_f <= 0;
     end
     else
     begin
-        if (l15_noc3encoder_req_val && is_request && flit_state_next == `NOC3_REQ_DATA_1)
-            l15_noc3encoder_req_data_0_f <= l15_noc3encoder_req_data_0;
-        else if (l15_noc3encoder_req_val && is_request && flit_state_next == `NOC3_REQ_DATA_2)
-            l15_noc3encoder_req_data_0_f <= l15_noc3encoder_req_data_1;
-        else if (l15_noc3encoder_req_val && is_response && flit_state_next == `NOC3_RES_DATA_1)
-            l15_noc3encoder_req_data_0_f <= l15_noc3encoder_req_data_0;
-        else if (l15_noc3encoder_req_val && is_response && flit_state_next == `NOC3_RES_DATA_2)
-            l15_noc3encoder_req_data_0_f <= l15_noc3encoder_req_data_1;
+        if (l15_noc3encoder_req_val) begin
+            if(is_response) begin
+                if(flit_state_next == `NOC3_RES_DATA_1) 
+                    l15_noc3encoder_req_data_0_f <= l15_noc3encoder_req_data[`L15_UNPARAM_63_0];
+                else if(flit_state_next == `NOC3_RES_DATA_2)
+                    l15_noc3encoder_req_data_0_f <= l15_noc3encoder_req_data[`L15_UNPARAM_127_64];
+            end
+            else if(is_request)
+            begin
+                for (n_data_packet=0;n_data_packet<L15_MAX_DATA_PACKETS;n_data_packet=n_data_packet+1) begin
+                    if(flit_state_next == n_data_packet+`NOC3_REQ_DATA_1)  begin
+                        l15_noc3encoder_req_data_0_f <= l15_noc3encoder_req_data[(n_data_packet*64)+:64];
+                    end
+                end
+            end
+        end
     end
-end
+end            
+
 
 always @ (posedge clk)
 begin
@@ -183,7 +194,7 @@ begin
         begin
             // specify address (should be specified by default)
             msg_type = `MSG_TYPE_WB_REQ;
-            msg_length = 4; // 2 extra req headers + 2 data (128b)
+            msg_length = 2+L15_MAX_DATA_PACKETS; // 2 extra req headers + 8 data (512b=64*8)
             // msg_cache_type = `MSG_CACHE_TYPE_DATA;
         end
         `L15_NOC3_REQTYPE_DOWNGRADE_ACK:
@@ -265,11 +276,7 @@ begin
             flit[`MSG_SRC_FBITS_] = src_fbits;
             flit[`MSG_OPTIONS_3_] = msg_options_3;
         end
-        else if (flit_state == `NOC3_REQ_DATA_1)
-        begin
-            flit[`NOC_DATA_WIDTH-1:0] = l15_noc3encoder_req_data_0_f;
-        end
-        else if (flit_state == `NOC3_REQ_DATA_2)
+        else // (flit_state == `NOC3_REQ_DATA_1 ~ 8)
         begin
             flit[`NOC_DATA_WIDTH-1:0] = l15_noc3encoder_req_data_0_f;
         end

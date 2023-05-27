@@ -88,6 +88,7 @@ def usage():
     print("       --config_l1d_size <number>", file=sys.stderr)
     print("       --config_l15_size <number>", file=sys.stderr)
     print("       --config_l2_size <number>", file=sys.stderr)
+    print("       --config_l15_l1d_cacheline_size <number>", file=sys.stderr)
     print("              Cache sizes in bytes, defaults: 8192 (L1D/L1.5), 16384 (L1I), 65536 (L2)", file=sys.stderr)
     print("\n       --config_l1i_associativity <number>", file=sys.stderr)
     print("       --config_l1d_associativity <number>", file=sys.stderr)
@@ -453,6 +454,7 @@ def setParserOptions(parser):
     parser.add_option("--config_l1d_size", dest="config_l1d_size", action="store", default=8192)
     parser.add_option("--config_l15_size", dest="config_l15_size", action="store", default=8192)
     parser.add_option("--config_l2_size", dest="config_l2_size",   action="store", default=65536)
+    parser.add_option("--config_l15_l1d_cacheline_size", dest="config_l15_l1d_cacheline_size",   action="store", default=64)
     parser.add_option("--config_l1i_associativity", dest="config_l1i_associativity",   action="store", default=4)
     parser.add_option("--config_l1d_associativity", dest="config_l1d_associativity",   action="store", default=4)
     parser.add_option("--config_l15_associativity", dest="config_l15_associativity",   action="store", default=4)
@@ -785,6 +787,7 @@ def main():
     os.environ['PITON_NETWORK_CONFIG'] = options.network_config
 
     # cache config
+    print_info("l15/l1d cacheline size  = " + str(options.config_l15_l1d_cacheline_size))
     print_info("l15 size  = " + str(options.config_l15_size))
     print_info("l15 assoc = " + str(options.config_l15_associativity))
     print_info("l1d size  = " + str(options.config_l1d_size))
@@ -794,14 +797,15 @@ def main():
     print_info("l2  size  = " + str(options.config_l2_size))
     print_info("l2  assoc = " + str(options.config_l2_associativity))
 
-    os.environ['CONFIG_L15_SIZE']          = str(options.config_l15_size)
-    os.environ['CONFIG_L15_ASSOCIATIVITY'] = str(options.config_l15_associativity)
-    os.environ['CONFIG_L1D_SIZE']          = str(options.config_l1d_size)
-    os.environ['CONFIG_L1D_ASSOCIATIVITY'] = str(options.config_l1d_associativity)
-    os.environ['CONFIG_L1I_SIZE']          = str(options.config_l1i_size)
-    os.environ['CONFIG_L1I_ASSOCIATIVITY'] = str(options.config_l1i_associativity)
-    os.environ['CONFIG_L2_SIZE']           = str(options.config_l2_size)
-    os.environ['CONFIG_L2_ASSOCIATIVITY']  = str(options.config_l2_associativity)
+    os.environ['CONFIG_L15_L1D_CACHELINE_SIZE'] = str(options.config_l15_l1d_cacheline_size)
+    os.environ['CONFIG_L15_SIZE']           = str(options.config_l15_size)
+    os.environ['CONFIG_L15_ASSOCIATIVITY']  = str(options.config_l15_associativity)
+    os.environ['CONFIG_L1D_SIZE']           = str(options.config_l1d_size)
+    os.environ['CONFIG_L1D_ASSOCIATIVITY']  = str(options.config_l1d_associativity)
+    os.environ['CONFIG_L1I_SIZE']           = str(options.config_l1i_size)
+    os.environ['CONFIG_L1I_ASSOCIATIVITY']  = str(options.config_l1i_associativity)
+    os.environ['CONFIG_L2_SIZE']            = str(options.config_l2_size)
+    os.environ['CONFIG_L2_ASSOCIATIVITY']   = str(options.config_l2_associativity)
 
     # this is needed to generate the device tree
     os.environ['CONFIG_SYS_FREQ']          = str(int(float(design_data["BOARDS"][options.board]["FREQ"]) * 1e6))
@@ -835,7 +839,8 @@ def main():
                  ' -config_l1i_associativity=' + str(options.config_l1i_associativity) + \
                  ' -config_l1d_associativity=' + str(options.config_l1d_associativity) + \
                  ' -config_l15_associativity=' + str(options.config_l15_associativity) + \
-                 ' -config_l2_associativity='  + str(options.config_l2_associativity)
+                 ' -config_l2_associativity='  + str(options.config_l2_associativity) + \
+                 ' -config_l15_l1d_cacheline_size=' + str(options.config_l15_l1d_cacheline_size)
 
         if options.core == 'pico':
             config += ' -pico'

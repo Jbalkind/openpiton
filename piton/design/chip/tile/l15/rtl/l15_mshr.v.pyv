@@ -45,7 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `ifdef DEFAULT_NETTYPE_NONE
 `default_nettype none
 `endif
-module l15_mshr(
+module l15_mshr #(
+    parameter L15_L1D_LINE_SIZE = 64
+)(
     input wire clk,
     input wire rst_n,
 
@@ -53,8 +55,8 @@ module l15_mshr(
     input wire pipe_mshr_writereq_val_s1,
     input wire [`L15_MSHR_WRITE_TYPE_WIDTH-1:0] pipe_mshr_writereq_op_s1,
     input wire [`L15_PADDR_HI:0] pipe_mshr_writereq_address_s1,
-    input wire [127:0] pipe_mshr_writereq_write_buffer_data_s1,
-    input wire [15:0] pipe_mshr_writereq_write_buffer_byte_mask_s1,
+    input wire [(L15_L1D_LINE_SIZE*8)-1:0] pipe_mshr_writereq_write_buffer_data_s1,
+    input wire [L15_L1D_LINE_SIZE-1:0] pipe_mshr_writereq_write_buffer_byte_mask_s1,
     input wire [`L15_CONTROL_WIDTH-1:0] pipe_mshr_writereq_control_s1,
     input wire [`L15_MSHR_ID_WIDTH-1:0] pipe_mshr_writereq_mshrid_s1,
     input wire [`L15_THREADID_MASK] pipe_mshr_writereq_threadid_s1,
@@ -74,8 +76,8 @@ module l15_mshr(
     //s2
     input wire pipe_mshr_write_buffer_rd_en_s2,
     input wire [`L15_THREADID_MASK] pipe_mshr_threadid_s2,
-    output reg [127:0]mshr_pipe_write_buffer_s2,
-    output reg [15:0] mshr_pipe_write_buffer_byte_mask_s2,
+    output reg [(L15_L1D_LINE_SIZE*8)-1:0] mshr_pipe_write_buffer_s2,
+    output reg [L15_L1D_LINE_SIZE-1:0] mshr_pipe_write_buffer_byte_mask_s2,
 
     //s3
     input wire pipe_mshr_val_s3,
@@ -129,8 +131,8 @@ reg [`L15_NUM_THREADS-1:0] st_val;
 reg [`PACKET_HOME_ID_WIDTH-1:0] st_homeid [0:`L15_NUM_THREADS-1];
 reg [`L15_MESI_TRANS_STATE_WIDTH-1:0] st_state [0:`L15_NUM_THREADS-1];
 reg [1:0] st_way [0:`L15_NUM_THREADS-1];
-reg [127:0] st_write_buffer [0:`L15_NUM_THREADS-1];
-reg [15:0] st_write_buffer_byte_mask [0:`L15_NUM_THREADS-1];
+reg [(L15_L1D_LINE_SIZE*8)-1:0] st_write_buffer [0:`L15_NUM_THREADS-1];
+reg [L15_L1D_LINE_SIZE-1:0] st_write_buffer_byte_mask [0:`L15_NUM_THREADS-1];
 
 /////////////////
 // renaming
@@ -205,8 +207,8 @@ begin
     endcase
 
     // write-buffer reading in S2
-    mshr_pipe_write_buffer_s2[127:0] = 128'b0;
-    mshr_pipe_write_buffer_byte_mask_s2 = 16'b0;
+    mshr_pipe_write_buffer_s2[(L15_L1D_LINE_SIZE*8)-1:0] = {(L15_L1D_LINE_SIZE*8){1'b0}};
+    mshr_pipe_write_buffer_byte_mask_s2 = {L15_L1D_LINE_SIZE{1'b0}};
     if (pipe_mshr_write_buffer_rd_en_s2)
     begin
         mshr_pipe_write_buffer_s2 = st_write_buffer[pipe_mshr_threadid_s2];
@@ -216,13 +218,14 @@ end
 
 // Write operation
 // generating mask for write
-reg [127:0] bit_write_mask_s1;
+reg [(L15_L1D_LINE_SIZE*8)-1:0] bit_write_mask_s1;
+integer i;
 always @ *
 begin
-    <%
-    for i in range(128):
-        print("bit_write_mask_s1[%d] = pipe_mshr_writereq_write_buffer_byte_mask_s1[%d];" % (i, i/8))
-    %>
+    for (i=0; i<(L15_L1D_LINE_SIZE*8);i=i+1)
+    begin
+        bit_write_mask_s1[i] = pipe_mshr_writereq_write_buffer_byte_mask_s1[i/8];
+    end
 end
 
 

@@ -40,6 +40,7 @@ set PITON_NUM_TILES                 [expr $PITON_X_TILES * $PITON_Y_TILES]
 set PITON_NETWORK_CONFIG            "2dmesh_config"
 
 # Cache Configurations
+set PITON_CONFIG_L15_L1D_CACHELINE_SIZE 64
 set PITON_CONFIG_L15_SIZE           8192
 set PITON_CONFIG_L15_ASSOCIATIVITY  4
 set PITON_CONFIG_L1D_SIZE           8192

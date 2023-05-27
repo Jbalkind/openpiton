@@ -305,10 +305,15 @@ system system(
 `endif // endif PITON_CHIPSET_DIFF_CLK
 `else // ifndef PITON_CHIPSET_CLKS_GEN
 `ifndef VERILATOR
+`ifndef PITON_NO_CHIP_BRIDGE
     .chipset_clk(chipset_clk),
 `else
     .chipset_clk(core_ref_clk),
 `endif
+`else
+    .chipset_clk(core_ref_clk),
+`endif
+
 `ifndef PITONSYS_NO_MC
 `ifdef PITON_FPGA_MC_DDR3
     .mc_clk(mem_clk),

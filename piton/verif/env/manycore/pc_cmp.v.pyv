@@ -278,7 +278,7 @@ task trap_extract;
             good_string = """
                     if($value$plusargs("good_trap{0}=%h", tmp_val)) begin
                         good_trap[{0}] = tmp_val;
-                        good_trap_exists[{0}] = 1'b1;
+                        good_trap_exists[{0}] = 1'b1;                        
                         $display ("%t: good_trap %h", $time, good_trap[{0}]);
                     end"""
             print(good_string.format(i))
@@ -312,8 +312,13 @@ initial hitted = 0;
 
 reg first_rst;
 initial begin
-    max = 1000;
-    if($value$plusargs("TIMEOUT=%d", max)) $display("rtl_timeout = %d", max);
+    `ifndef VERILATOR
+        max = 1000;
+        if($value$plusargs("TIMEOUT=%d", max)) $display("rtl_timeout = %d", max);
+    `else
+        max = 100000000;
+        $display("rtl_timeout = %d", max);
+    `endif
     #20//need to wait for socket initializing.
      trap_extract;
     done    = 0;

@@ -26,7 +26,7 @@
 `include "piton_system.vh"
 `include "jtag.vh"
 
-module chip(
+module chip (
 `ifndef PITON_CHIP_FPGA
    // IO cell configs
    input                                        slew,
@@ -1038,7 +1038,7 @@ module chip(
     // Generate tile instances
 <%
     template = r'''
-    tile #(.TILE_TYPE(TYPE_OF_TILE))
+    tile #(.TILE_TYPE(TYPE_OF_TILE), .L15_L1D_LINE_SIZE(L15_L1D_LINE_SIZE_VALUE))
     tile0 (
         .clk                (clk_muxed),
         .rst_n              (rst_n_inter_sync),
@@ -1141,6 +1141,7 @@ module chip(
                 currenttype = "`SPARC_TILE"
 
             currenttile = currenttile.replace("TYPE_OF_TILE", currenttype)
+            currenttile = currenttile.replace("L15_L1D_LINE_SIZE_VALUE", str(PITON_L15_L1D_LINE_SIZE))
 
             if (PITON_NETWORK_CONFIG == "xbar_config"):
                 currenttile = currenttile.replace("in_", "xbar_%d_out_" % i);

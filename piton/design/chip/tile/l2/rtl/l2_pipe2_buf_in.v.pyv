@@ -100,9 +100,17 @@ begin
     end
     else if((msg_state_f == msg_state_header0) && valid_in)
     begin
-        if (data_in[`MSG_LENGTH] == `MSG_LENGTH_WIDTH'd8)
+        if (data_in[`MSG_LENGTH] == `MSG_LENGTH_WIDTH'd8) 
         begin
             msg_data_state_next = msg_data_state_8F;
+        end
+        else if (data_in[`MSG_LENGTH] == `MSG_LENGTH_WIDTH'd10)
+        begin
+            msg_data_state_next = msg_data_state_8F;
+        end
+        else if (data_in[`MSG_LENGTH] == `MSG_LENGTH_WIDTH'd6)
+        begin
+            msg_data_state_next = msg_data_state_4F;
         end
         else if (data_in[`MSG_LENGTH] == `MSG_LENGTH_WIDTH'd0)
         begin
@@ -164,6 +172,10 @@ begin
             msg_state_next = msg_state_header0;
         end
 `endif
+        else if ((msg_state_f == msg_state_data3) && (msg_data_state_f == msg_data_state_4F))
+        begin
+            msg_state_next = msg_state_header0;
+        end
         else if ((msg_state_f == msg_state_data1) && (msg_data_state_f == msg_data_state_2F))
         begin
             msg_state_next = msg_state_header0;

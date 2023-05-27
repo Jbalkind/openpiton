@@ -203,9 +203,9 @@ append RTL_SOURCE_FILES        "${DV_ROOT}/design/chip/tile/l15/rtl/l15_hmc.v "
 append RTL_SOURCE_FILES        "${DV_ROOT}/design/chip/tile/l15/rtl/l15_home_encoder.v "
 append RTL_SOURCE_FILES        "${DV_ROOT}/design/chip/tile/l15/rtl/l15_csm.v "
 append RTL_SOURCE_FILES        "${DV_ROOT}/design/chip/tile/l15/rtl/l15_priority_encoder.v "
-append RTL_SOURCE_FILES        "${DV_ROOT}/design/chip/tile/l15/rtl/sram_wrappers/L15_TAG_SRAM_WRAPPER_HERE.v "
-append RTL_SOURCE_FILES        "${DV_ROOT}/design/chip/tile/l15/rtl/sram_wrappers/L15_DATA_SRAM_WRAPPER_HERE.v "
-append RTL_SOURCE_FILES        "${DV_ROOT}/design/chip/tile/l15/rtl/sram_wrappers/L15_HMT_SRAM_WRAPPER_HERE.v "
+append RTL_SOURCE_FILES        "${DV_ROOT}/design/chip/tile/l15/rtl/sram_wrappers/sram_l15_data.v "
+append RTL_SOURCE_FILES        "${DV_ROOT}/design/chip/tile/l15/rtl/sram_wrappers/sram_l15_tag.v "
+append RTL_SOURCE_FILES        "${DV_ROOT}/design/chip/tile/l15/rtl/sram_wrappers/sram_l15_hmt.v "
 append RTL_SOURCE_FILES        "${DV_ROOT}/design/chip/tile/common/rtl/flat_id_to_xy.v "
 
 # L2

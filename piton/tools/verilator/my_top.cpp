@@ -27,9 +27,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Vcmp_top.h"
 #include "verilated.h"
 #include <iostream>
+#define VERILATOR_VCD
 #ifdef VERILATOR_VCD
 #include "verilated_vcd_c.h"
 #endif
+
+extern "C" void init_jbus_model_call(const char *str, int oram);
 
 uint64_t main_time = 0; // Current simulation time
 uint64_t clk = 0;
