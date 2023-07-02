@@ -143,6 +143,7 @@
     `undef PITON_FPGA_SD_BOOT
     `undef PITONSYS_SPI
     `define PITONSYS_AXI4_MEM
+    `define PITONSYS_AXI4_MEM_PINS
 `endif
 
 // If PITON_FPGA_SD_BOOT is set we should always include SPI
@@ -160,3 +161,48 @@
 `elsif XUPP3R_BOARD
     `define PITONSYS_DDR4
 `endif
+
+// OLED screen and buttons
+`ifdef GENESYS2_BOARD
+    `define PITON_FPGA_OLED
+    `define PITON_FPGA_BUTTONS
+`elsif NEXYSVIDEO_BOARD
+    `define PITON_FPGA_OLED
+    `define PITON_FPGA_BUTTONS
+`elsif VCU118_BOARD
+    `define PITON_FPGA_BUTTONS
+    `define PITON_FPGA_BUTTONS_C
+`endif
+
+`ifndef XUPP3R_BOARD
+    // All boards to date except XUPP3R have switches
+    `define PITON_FPGA_GPIO_SW
+    // All boards to date except XUPP3R have 8 LEDs
+    `define PITON_FPGA_LED_NUM 8
+    // All boards except VCU118 have 8 DIP switches
+    `ifndef VCU118_BOARD
+        `define PITON_FPGA_GPIO_SW_NUM 8
+    `else
+        `define PITON_FPGA_GPIO_SW_NUM 4
+    `endif // ifndef VCU118_BOARD
+`else
+    `define PITON_FPGA_LED_NUM 4
+`endif // ifndef XUPP3R_BOARD
+
+`ifdef PITON_FPGA_ETHERNETLITE
+    `ifdef GENESYS2_BOARD
+        `define PITON_FPGA_RGMII_PHY
+    `elsif NEXYSVIDEO_BOARD
+        `define PITON_FPGA_RGMII_PHY
+    `endif
+`endif // ifdef PITON_FPGA_ETHERNETLITE
+
+`ifdef PITON_RV64_DEBUGUNIT
+    `ifdef GENESYS2_BOARD
+        `define PITON_FPGA_JTAG_PINS
+    `elsif VC707_BOARD
+        `define PITON_FPGA_JTAG_BSCANE2
+    `elsif NEXYSVIDEO_BOARD
+        `define PITON_FPGA_JTAG_BSCANE2
+    `endif
+`endif // ifdef PITON_RV64_DEBUGUNIT

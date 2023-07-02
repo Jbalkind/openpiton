@@ -86,6 +86,9 @@
 
 module chipset(
 
+    // reset
+    input                                       rst_n
+
 `ifdef F1_BOARD
     input sys_clk,
 `else
@@ -139,8 +142,6 @@ module chipset(
     `endif // endif PITONSYS_INC_PASSTHRU
 `endif // endif PITON_CLKS_CHIPSET
 
-    // reset
-    input                                       rst_n,
 `ifdef PITON_BOARD
     // to chip
     output                                      chip_rst_n,
@@ -253,7 +254,8 @@ module chipset(
     output [`DDR3_DM_WIDTH-1:0]                 ddr_dm,
 `endif // PITONSYS_DDR4
     output [`DDR3_ODT_WIDTH-1:0]                ddr_odt,
-`else // F1_BOARD
+`endif // ifndef F1_BOARD
+`ifdef PITONSYS_AXI4_MEM_PINS
     input                                        mc_clk,
     // AXI Write Address Channel Signals
     output wire [`AXI4_ID_WIDTH     -1:0]    m_axi_awid,
@@ -311,7 +313,7 @@ module chipset(
     output wire                                   m_axi_bready,
 
     input  wire                                   ddr_ready,
-`endif // ifndef F1_BOARD
+`endif // ifdef PITONSYS_AXI4_MEM_PINS
 `endif //`ifdef PITON_FPGA_MC_DDR3
 `endif // endif PITONSYS_NO_MC
 
@@ -340,7 +342,7 @@ module chipset(
         inout                                       sd_cmd,
         inout   [3:0]                               sd_dat,
     `endif // endif PITONSYS_SPI
-    `ifdef PITON_FPGA_ETHERNETLITE
+    `ifdef PITON_FPGA_RGMII_PHY
         // Emaclite interface
         output                                          net_phy_txc,
         output                                          net_phy_txctl,
@@ -355,7 +357,7 @@ module chipset(
         inout                                           net_phy_mdio_io,
         output                                          net_phy_mdc,
 
-    `endif // PITON_FPGA_ETHERNETLITE    
+    `endif // PITON_FPGA_RGMII_PHY    
 `else // ifndef PITONSYS_IOCTRL
 
 `endif // endif PITONSYS_IOCTRL
@@ -426,53 +428,32 @@ module chipset(
     input                                               F79_N,
     input                                               F79_P
 `else   // PITON_BOARD
-    `ifdef GENESYS2_BOARD
-        input                                               btnl,
-        input                                               btnr,
-        input                                               btnu,
-        input                                               btnd,
-
-        output                                              oled_sclk,
-        output                                              oled_dc,
-        output                                              oled_data,
-        output                                              oled_vdd_n,
-        output                                              oled_vbat_n,
-        output                                              oled_rst_n,
-    `elsif NEXYSVIDEO_BOARD
-        input                                               btnl,
-        input                                               btnr,
-        input                                               btnu,
-        input                                               btnd,
-
-        output                                              oled_sclk,
-        output                                              oled_dc,
-        output                                              oled_data,
-        output                                              oled_vdd_n,
-        output                                              oled_vbat_n,
-        output                                              oled_rst_n,
-    `elsif VCU118_BOARD
-        input                                               btnl,
-        input                                               btnr,
-        input                                               btnu,
-        input                                               btnd,
-        input                                               btnc,           
-    `endif
+    `ifdef PITONSYS_FPGA_OLED
+        ,output                                      oled_sclk
+        ,output                                      oled_dc
+        ,output                                      oled_data
+        ,output                                      oled_vdd_n
+        ,output                                      oled_vbat_n
+        ,output                                      oled_rst_n
+    `endif // ifdef PITONSYS_OLED
+    
+    `ifdef PITONSYS_FPGA_BUTTONS
+        ,input                                       btnl
+        ,input                                       btnr
+        ,input                                       btnu
+        ,input                                       btnd
+    
+    `ifdef PITONSYS_FPGA_BUTTONS_C
+        ,input                                       btnc
+    `endif // ifdef PITONSYS_BUTTONS_C
+    `endif // ifdef PITONSYS_BUTTONS
 
     // Switches
-    `ifdef VCU118_BOARD
-        // we only have 4 gpio dip switches on this board
-        input  [3:0]                                        sw,
-    `elsif XUPP3R_BOARD
-        // no switches :(
-    `else         
-        input  [7:0]                                        sw,
-    `endif
+    `ifdef PITON_FPGA_GPIO_SW
+        ,input  [`PITON_FPGA_GPIO_SW_NUM-1:0]           sw
+    `endif // ifdef PITON_FPGA_GPIO_SW
 
-    `ifdef XUPP3R_BOARD
-     output [3:0]                                           leds
-    `else 
-     output [7:0]                                           leds
-     `endif
+    ,output [`PITON_FPGA_LED_NUM-1:0]               leds
 
 `endif  // PITON_BOARD
 
@@ -1313,7 +1294,8 @@ chipset_impl_noc_power_test  chipset_impl (
                     .ddr_dm(ddr_dm),
                 `endif // XUPP3R_BOARD
                 .ddr_odt(ddr_odt)
-            `else // ifndef F1_BOARD
+            `endif // ifndef F1_BOARD
+            `ifdef PITONSYS_AXI4_MEM_PINS
                 .mc_clk(mc_clk),
                 // AXI Write Address Channel Signals
                 .m_axi_awid(m_axi_awid),
@@ -1371,7 +1353,7 @@ chipset_impl_noc_power_test  chipset_impl (
                 .m_axi_bready(m_axi_bready), 
 
                 .ddr_ready(ddr_ready)
-            `endif //ifndef F1_BOARD
+            `endif //ifdef PITONSYS_AXI4_MEM_PINS
         `endif // endif PITON_FPGA_MC_DDR3
     `endif // endif PITONSYS_NO_MC
 
@@ -1401,7 +1383,7 @@ chipset_impl_noc_power_test  chipset_impl (
             .sd_cmd(sd_cmd),
             .sd_dat(sd_dat)
         `endif // endif PITONSYS_SPI
-            `ifdef PITON_FPGA_ETHERNETLITE      
+            `ifdef PITON_FPGA_RGMII_PHY
                 ,
                 .net_axi_clk        (net_axi_clk            ),
                 .net_phy_rst_n      (net_phy_rst_n          ),
@@ -1418,7 +1400,7 @@ chipset_impl_noc_power_test  chipset_impl (
                 .net_phy_mdio_io    (net_phy_mdio_io        ),
                 .net_phy_mdc        (net_phy_mdc            )
 
-            `endif // PITON_FPGA_ETHERNETLITE   
+            `endif // PITON_FPGA_RGMII_PHY
     `endif // endif PITONSYS_IOCTRL
 
     `ifdef PITON_RV64_PLATFORM
@@ -1449,7 +1431,7 @@ chipset_impl_noc_power_test  chipset_impl (
 
 
 `ifdef PITONSYS_IOCTRL
-    `ifdef PITON_FPGA_ETHERNETLITE
+    `ifdef PITON_FPGA_RGMII_PHY
         // Simplified RGMII <-> MII converter
         // TX clk is 25 MHz
 
@@ -1576,7 +1558,7 @@ chipset_impl_noc_power_test  chipset_impl (
         end
 
         assign net_phy_rxd_inter = net_phy_rxd_ff;                
-    `endif //PITON_FPGA_ETHERNETLITE
+    `endif //PITON_FPGA_RGMII_PHY
     //-------------------------------------------------------
 
     `ifdef PITONSYS_SPI
@@ -1604,30 +1586,13 @@ chipset_impl_noc_power_test  chipset_impl (
 `endif  // PITONSYS_IOCTRL
 
 
+`ifdef PITONSYS_FPGA_OLED
+    oled_wrapper     #(
 `ifdef GENESYS2_BOARD
-    oled_wrapper     #(
         .OLED_SYS_CLK_KHZ   (50000),
-        .OLED_SPI_CLK_KHZ   (5000)
-    ) oled_wrapper (
-        .sys_clk        (chipset_clk        ),
-        .sys_rst_n      (chipset_rst_n_ff   ),
-
-        .btnl           (btnl           ),
-        .btnr           (btnr           ),
-        .btnu           (btnu           ),
-        .btnd           (btnd           ),
-
-        .spi_sclk       (oled_sclk      ),
-        .spi_dc         (oled_dc        ),
-        .spi_data       (oled_data      ),
-
-        .vdd_n          (oled_vdd_n     ),
-        .vbat_n         (oled_vbat_n    ),
-        .rst_n          (oled_rst_n     )
-    );
 `elsif NEXYSVIDEO_BOARD
-    oled_wrapper     #(
         .OLED_SYS_CLK_KHZ   (30000),
+`endif
         .OLED_SPI_CLK_KHZ   (5000)
     ) oled_wrapper (
         .sys_clk        (chipset_clk        ),
