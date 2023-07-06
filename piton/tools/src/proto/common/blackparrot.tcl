@@ -57,7 +57,6 @@ set vincludes_list   [lindex $vlist 1]
 set rtl_files        [concat $rtl_files $vsources_list]
 set include_dirs     [concat $include_dirs $vincludes_list]
 
-set file_obj [get_filesets sources_1]
 foreach v $rtl_files {
   if {[string first bsg_mem_1rw_sync_mask_write_bit.v $v] != -1} {
     set f $BASEJUMP_STL_DIR/hard/ultrascale_plus/bsg_mem/bsg_mem_1rw_sync_mask_write_bit.v
@@ -71,7 +70,6 @@ foreach v $rtl_files {
 
   lappend BLACKPARROT_RTL_IMPL_FILES $f
 }
-add_files -quiet -norecurse -fileset $file_obj $BLACKPARROT_RTL_IMPL_FILES
 
 foreach i $include_dirs {
     lappend BLACKPARROT_INCLUDE_DIRS $i
