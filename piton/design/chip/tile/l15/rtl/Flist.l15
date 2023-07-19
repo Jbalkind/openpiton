@@ -33,10 +33,7 @@ rf_l15_lruarray.v
 rf_l15_mesi.v
 rf_l15_lrsc_flag.v
 rf_l15_wmt.v
-l15_cpxencoder.v
 
-pcx_buffer.v
-pcx_decoder.v
 noc1encoder.v
 noc1buffer.v
 noc3encoder.v

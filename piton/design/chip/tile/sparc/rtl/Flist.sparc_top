@@ -24,6 +24,9 @@ sparc_core.v
 sparc.v
 cpx_arbitrator.v
 ccx_l15_transducer.v
+l15_cpxencoder.v
+pcx_buffer.v
+pcx_decoder.v
 // bw_clk_cl_sparc_cmp.v
 cpx_spc_rpt.v
 cpx_spc_buf.v
