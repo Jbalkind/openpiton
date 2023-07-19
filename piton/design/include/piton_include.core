@@ -8,7 +8,6 @@ filesets:
             - iop.h: {is_include_file: true}
             - network_define.v: {is_include_file: true}
             - piton_system.vh: {is_include_file: true}
-            - sys.h: {is_include_file: true}
             - jtag.vh: {is_include_file: true}
             - dmbr_define.v: {is_include_file: true}
         depend:
