@@ -138,7 +138,7 @@ module pico_decoder(
         if (pico_mem_valid) begin
 	        // store or atomic operation 
             if (pico_mem_wstrb) begin
-	            picodecoder_l15_rqtype = `STORE_RQ;
+	            picodecoder_l15_rqtype = `PCX_REQTYPE_STORE;
                 // endian wizardry
                 pico_wdata_flipped = {pico_mem_wdata[7:0], pico_mem_wdata[15:8],
                                       pico_mem_wdata[23:16], pico_mem_wdata[31:24]};
@@ -168,7 +168,7 @@ module pico_decoder(
 	        // load operation
 	        else begin
 	            pico_wdata_flipped = 32'b0;
-                picodecoder_l15_rqtype = `LOAD_RQ;
+                picodecoder_l15_rqtype = `PCX_REQTYPE_LOAD;
 	            picodecoder_l15_size = `MSG_DATA_SIZE_4B;
 	        end 
         end

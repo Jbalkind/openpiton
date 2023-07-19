@@ -65,7 +65,7 @@ module l15_picoencoder(
     always @ * begin
         if (l15_picoencoder_val) begin
             case(l15_picoencoder_returntype)
-                `LOAD_RET, `CPX_RESTYPE_ATOMIC_RES: begin
+                `CPX_RESTYPE_LOAD, `CPX_RESTYPE_ATOMIC_RES: begin
                     // load
                     int_recv = 1'b0;
                     pico_mem_ready = 1'b1;
@@ -86,12 +86,12 @@ module l15_picoencoder(
                         end
                     endcase 
                 end
-                `ST_ACK: begin
+                `CPX_RESTYPE_STORE_ACK: begin
                     int_recv = 1'b0;
                     pico_mem_ready = 1'b1;
                     rdata_part = 32'b0;
                 end
-                `INT_RET: begin
+                `CPX_RESTYPE_INTERRUPT: begin
                     if (l15_picoencoder_data_0[17:16] == 2'b01) begin
                         int_recv = 1'b1;
                     end
