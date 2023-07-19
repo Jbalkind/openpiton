@@ -28,11 +28,14 @@
 #include "sparcv9/core1.diaglist"
 #include "sparcv9/chip8.diaglist"
 #include "sparcv9/master_diaglist_sparcv9"
-#endif // ifdef SPARCV9
+// ifdef SPARCV9
+#endif
 #ifdef RISCV64
 #include "riscv/rv64/master_diaglist_riscv64"
-#endif // ifdef RISCV64
+// ifdef RISCV64
+#endif
 #ifdef RISCV32
 #include "riscv/rv32/master_diaglist_riscv32"
-#endif // ifdef RISCV32
+// ifdef RISCV32
+#endif
 </all>
