@@ -1,7 +1,7 @@
 // Modified by Princeton University on June 9th, 2015
 // ========== Copyright Header Begin ==========================================
 // 
-// OpenSPARC T1 Processor File: Flist.dft_common
+// OpenSPARC T1 Processor File: Flist.clib_common
 // Copyright (c) 2006 Sun Microsystems, Inc.  All Rights Reserved.
 // DO NOT ALTER OR REMOVE COPYRIGHT NOTICES.
 // 
@@ -19,4 +19,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 // 
 // ========== Copyright Header End ============================================
--v clk_gating_latch.v
+-v m1.beh.v
+-v u1.beh.v
+

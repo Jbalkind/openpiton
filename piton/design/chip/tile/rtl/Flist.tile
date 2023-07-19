@@ -27,4 +27,3 @@
 
 config_regs.v
 tile.v
-pico_l15_transducer.v

@@ -39,7 +39,7 @@ set GLOBAL_INCLUDE_FILES [list \
     "${DV_ROOT}/design/include/l2.h" \
     "${DV_ROOT}/design/include/network_define.v" \
     "${DV_ROOT}/design/include/jtag.vh" \
-    "${DV_ROOT}/design/chip/tile/sparc/include/ifu.h" \
+    "${OST1_ROOT}/include/ifu.h" \
     "${DV_ROOT}/design/include/lsu.h" \
     "${DV_ROOT}/design/chipset/include/chipset_define.vh" \
 ]
@@ -89,8 +89,6 @@ set CHIP_RTL_IMPL_FILES [list \
     "${DV_ROOT}/design/chip/tile/rtl/tile.v" \
     "${DV_ROOT}/design/chip/tile/rtl/config_regs.v" \
     "${DV_ROOT}/design/chip/tile/rtl/cpx_arbitrator.v" \
-    "${DV_ROOT}/design/chip/tile/rtl/ccx_l15_transducer.v" \
-    "${DV_ROOT}/design/chip/tile/rtl/pico_l15_transducer.v" \
     "${DV_ROOT}/design/chip/tile/l2/rtl/l2.v" \
     "${DV_ROOT}/design/chip/tile/l2/rtl/l2_priority_encoder.v" \
     "${DV_ROOT}/design/chip/tile/l2/rtl/l2_data_pgen.v" \
@@ -136,17 +134,12 @@ set CHIP_RTL_IMPL_FILES [list \
     "${DV_ROOT}/design/chip/tile/l15/rtl/l15_pipeline.v" \
     "${DV_ROOT}/design/chip/tile/l15/rtl/l15_mshr.v" \
     "${DV_ROOT}/design/chip/tile/l15/rtl/l15_csm.v" \
-    "${DV_ROOT}/design/chip/tile/l15/rtl/l15_picoencoder.v" \
-    "${DV_ROOT}/design/chip/tile/l15/rtl/l15_cpxencoder.v" \
     "${DV_ROOT}/design/chip/tile/l15/rtl/noc3encoder.v" \
     "${DV_ROOT}/design/chip/tile/l15/rtl/noc3buffer.v" \
     "${DV_ROOT}/design/chip/tile/l15/rtl/noc2decoder.v" \
     "${DV_ROOT}/design/chip/tile/l15/rtl/noc1encoder.v" \
     "${DV_ROOT}/design/chip/tile/l15/rtl/noc1buffer.v" \
     "${DV_ROOT}/design/chip/tile/l15/rtl/simplenocbuffer.v" \
-    "${DV_ROOT}/design/chip/tile/l15/rtl/pico_decoder.v" \
-    "${DV_ROOT}/design/chip/tile/l15/rtl/pcx_decoder.v" \
-    "${DV_ROOT}/design/chip/tile/l15/rtl/pcx_buffer.v" \
     "${DV_ROOT}/design/chip/tile/l15/rtl/l15_priority_encoder.v" \
     "${DV_ROOT}/design/chip/tile/l15/rtl/l15_home_encoder.v" \
     "${DV_ROOT}/design/chip/tile/l15/rtl/l15_hmc.v" \
@@ -184,10 +177,6 @@ set CHIP_RTL_IMPL_FILES [list \
     "${DV_ROOT}/design/chip/tile/rtap/rtl/rtap_ucb_transmitter.v" \
     "${DV_ROOT}/design/chip/tile/rtap/rtl/rtap_ucb_receiver.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/swrvr_clib.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/swrvr_dlib.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/u1.beh.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/m1.beh.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/mul64.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/ucb_bus_out.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/ucb_bus_in.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/valrdy_to_credit.v" \
@@ -196,17 +185,28 @@ set CHIP_RTL_IMPL_FILES [list \
     "${DV_ROOT}/design/chip/tile/common/rtl/xy_to_flat_id.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/clk_gating_latch.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/test_stub_scan.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/synchronizer_asr.v" \
     "${DV_ROOT}/design/chip/tile/common/rtl/test_stub_bist.v" \
-    "${DV_ROOT}/design/chip/tile/common/rtl/cluster_header.v" \
     "${DV_ROOT}/design/chip/tile/pico/rtl/picorv32.v" \
     "${DV_ROOT}/design/chip/tile/pico/rtl/pico_reset.v" \
+    "${DV_ROOT}/design/chip/tile/pico/rtl/pico_l15_transducer.v" \
+    "${DV_ROOT}/design/chip/tile/pico/rtl/l15_picoencoder.v" \
+    "${DV_ROOT}/design/chip/tile/pico/rtl/pico_decoder.v" \
     "${OST1_ROOT}/rtl/sparc.v" \
     "${OST1_ROOT}/rtl/sparc_core.v" \
     "${OST1_ROOT}/rtl/sparc_tri.v" \
+    "${OST1_ROOT}/rtl/ccx_l15_transducer.v" \
+    "${OST1_ROOT}/rtl/l15_cpxencoder.v" \
+    "${OST1_ROOT}/rtl/pcx_decoder.v" \
+    "${OST1_ROOT}/rtl/pcx_buffer.v" \
     "${OST1_ROOT}/rtl/cpx_spc_rpt.v" \
     "${OST1_ROOT}/rtl/cpx_spc_buf.v" \
     "${OST1_ROOT}/rtl/cfg_asi.v" \
+    "${OST1_ROOT}/common/rtl/swrvr_dlib.v" \
+    "${OST1_ROOT}/common/rtl/u1.beh.v" \
+    "${OST1_ROOT}/common/rtl/m1.beh.v" \
+    "${OST1_ROOT}/common/rtl/mul64.v" \
+    "${OST1_ROOT}/common/rtl/synchronizer_asr.v" \
+    "${OST1_ROOT}/common/rtl/cluster_header.v" \
     "${OST1_ROOT}/fpu/rtl/fpu_arb_wrap.v" \
     "${OST1_ROOT}/fpu/rtl/fpu.v" \
     "${OST1_ROOT}/fpu/rtl/fpu_arb.v" \

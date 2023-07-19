@@ -19,4 +19,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 // 
 // ========== Copyright Header End ============================================
--v clk_gating_latch.v
+-v cluster_header.v
+//-v test_stub_bist.v
+//-v test_stub_scan.v
+-v synchronizer_asr.v
