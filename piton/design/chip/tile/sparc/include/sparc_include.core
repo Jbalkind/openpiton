@@ -6,6 +6,7 @@ filesets:
     rtl:
         files:
             - tlu.h: {is_include_file: true}
+            - iop.h: {is_include_file: true}
         depend:
             - openpiton::preprocessor
         file_type: verilogSource-2001
