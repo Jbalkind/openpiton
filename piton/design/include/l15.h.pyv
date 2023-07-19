@@ -27,7 +27,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //l15.h
 `include "define.tmp.h"
-`include "iop.h"
 
 `ifndef L15_H
 `define L15_H
