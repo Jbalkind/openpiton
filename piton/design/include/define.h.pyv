@@ -235,6 +235,11 @@ print("`define PITON_Y_TILES %d"   % PITON_Y_TILES)
 `define MSG_TYPE_SWAPWB_P1_REQ      8'd63
 `define MSG_TYPE_SWAPWB_P2_REQ      8'd64
 
+// RISC-V CMOs from L1.5 to L2
+`define MSG_TYPE_RVCMO_INVAL_REQ    8'd65
+`define MSG_TYPE_RVCMO_CLEAN_REQ    8'd66
+`define MSG_TYPE_RVCMO_FLUSH_REQ    8'd67
+
 //Forward requests from L2 to L15
 `define MSG_TYPE_LOAD_FWD           8'd16
 `define MSG_TYPE_STORE_FWD          8'd17

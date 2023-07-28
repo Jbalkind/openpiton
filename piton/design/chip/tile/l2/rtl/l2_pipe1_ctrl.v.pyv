@@ -782,6 +782,7 @@ begin
                 `MSG_TYPE_LR_REQ,
                 `MSG_TYPE_WBGUARD_REQ, `MSG_TYPE_CAS_P2Y_REQ, `MSG_TYPE_SWAP_P2_REQ,
                 `MSG_TYPE_CAS_P1_REQ, `MSG_TYPE_SWAP_P1_REQ, `MSG_TYPE_L2_DIS_FLUSH_REQ,`MSG_TYPE_L2_LINE_FLUSH_REQ,
+                `MSG_TYPE_RVCMO_INVAL_REQ, MSG_TYPE_RVCMO_CLEAN_REQ, MSG_TYPE_RVCMO_FLUSH_REQ,
                 `MSG_TYPE_SWAPWB_P1_REQ, `MSG_TYPE_SWAPWB_P2_REQ,
                 `MSG_TYPE_AMO_ADD_P1_REQ, `MSG_TYPE_AMO_ADD_P2_REQ,
                 `MSG_TYPE_AMO_AND_P1_REQ, `MSG_TYPE_AMO_AND_P2_REQ,
@@ -1349,7 +1350,8 @@ begin
                 end
                 else if (msg_type_S2_f == `MSG_TYPE_WBGUARD_REQ
                  || msg_type_S2_f == `MSG_TYPE_L2_LINE_FLUSH_REQ
-                 || msg_type_S2_f == `MSG_TYPE_L2_DIS_FLUSH_REQ)
+                 || msg_type_S2_f == `MSG_TYPE_L2_DIS_FLUSH_REQ
+                 || msg_type_S2_f == `MSG_TYPE_RVCMO_FLUSH_REQ)
                 begin
                     cs_S2 = {`L2_AMO_ALU_NOP, n,         rd,      `OP_CLR, n,      rd,            n,       n,         `OP_CLR,    n,          n,
                              `OP_CLR,   n,       n,      `L2_VD_INVAL,  n,      `L2_MESI_I, n,      `L2_LRU_CLR};
@@ -1379,7 +1381,7 @@ begin
                                 `OP_CLR,   n,       n,      `L2_VD_INVAL,  n,      `L2_MESI_I, n,      `L2_LRU_CLR};
                     end
                 end
-                `MSG_TYPE_L2_DIS_FLUSH_REQ:
+                `MSG_TYPE_L2_DIS_FLUSH_REQ, MSG_TYPE_RVCMO_FLUSH_REQ:
                 begin
                     case (l2_way_state_mesi_S2)
                     `L2_MESI_I:
@@ -3062,7 +3064,7 @@ begin
             else if (!l2_tag_hit_S4)
             begin
                 begin
-                    if (msg_type_S4_f == `MSG_TYPE_L2_DIS_FLUSH_REQ || msg_type_S4_f == `MSG_TYPE_L2_LINE_FLUSH_REQ)
+                    if (msg_type_S4_f == `MSG_TYPE_L2_DIS_FLUSH_REQ || msg_type_S4_f == `MSG_TYPE_L2_LINE_FLUSH_REQ || msg_type_S4_f == `MSG_TYPE_RVCMO_FLUSH_REQ)
                     begin
                         cs_S4 = {n,         y,          `MSG_TYPE_DATA_ACK,    n,          `MSG_TYPE_ERROR};
                     end
@@ -3099,7 +3101,7 @@ begin
             else begin
             case (msg_type_S4_f)
                 //TODO
-                `MSG_TYPE_L2_DIS_FLUSH_REQ, `MSG_TYPE_L2_LINE_FLUSH_REQ:
+                `MSG_TYPE_L2_DIS_FLUSH_REQ, `MSG_TYPE_L2_LINE_FLUSH_REQ, `MSG_TYPE_RVCMO_FLUSH_REQ:
                 begin
                    case (l2_way_state_mesi_S4)
                     `L2_MESI_I:
