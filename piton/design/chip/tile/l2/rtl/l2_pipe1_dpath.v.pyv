@@ -832,6 +832,7 @@ begin
     end
     else if (((!l2_tag_hit_S2 && (msg_type_S2 != `MSG_TYPE_NC_STORE_REQ))
            || (msg_type_S2 == `MSG_TYPE_NC_LOAD_REQ || msg_type_S2 == `MSG_TYPE_L2_DIS_FLUSH_REQ)
+           || (msg_type_S2 == `MSG_TYPE_RVCMO_CLEAN_REQ)
            || (msg_type_S2 == `MSG_TYPE_RVCMO_FLUSH_REQ)
            || (l2_tag_hit_S2 && msg_type_S2 == `MSG_TYPE_NC_STORE_REQ))
     && (state_way_S2[l2_way_sel_S2][`L2_STATE_MESI] == `L2_MESI_I)
@@ -2122,9 +2123,9 @@ begin
             msg_send_data_S4 = {2{msg_data_S4_f}};
         end
     end
-    else if ((msg_type_S4 == `MSG_TYPE_L2_LINE_FLUSH_REQ || msg_type_S4 == `MSG_TYPE_L2_DIS_FLUSH_REQ
-         || msg_type_S4 == `MSG_TYPE_RVCMO_FLUSH_REQ)
+    else if (((msg_type_S4 == `MSG_TYPE_L2_LINE_FLUSH_REQ || msg_type_S4 == `MSG_TYPE_L2_DIS_FLUSH_REQ)
          &&  (msg_send_type_S4 == `MSG_TYPE_DATA_ACK))
+         || (msg_type_S4 == `MSG_TYPE_RVCMO_INVAL_REQ || msg_type_S4 == `MSG_TYPE_RVCMO_CLEAN_REQ || msg_type_S4 == `MSG_TYPE_RVCMO_FLUSH_REQ))
     begin
         msg_send_data_S4 = {`L2_DATA_DATA_WIDTH{1'b0}};
     end

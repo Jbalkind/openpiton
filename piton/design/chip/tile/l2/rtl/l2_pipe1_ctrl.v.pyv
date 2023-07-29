@@ -1351,6 +1351,8 @@ begin
                 else if (msg_type_S2_f == `MSG_TYPE_WBGUARD_REQ
                  || msg_type_S2_f == `MSG_TYPE_L2_LINE_FLUSH_REQ
                  || msg_type_S2_f == `MSG_TYPE_L2_DIS_FLUSH_REQ
+                 || msg_type_S2_f == `MSG_TYPE_RVCMO_INVAL_REQ
+                 || msg_type_S2_f == `MSG_TYPE_RVCMO_CLEAN_REQ
                  || msg_type_S2_f == `MSG_TYPE_RVCMO_FLUSH_REQ)
                 begin
                     cs_S2 = {`L2_AMO_ALU_NOP, n,         rd,      `OP_CLR, n,      rd,            n,       n,         `OP_CLR,    n,          n,
@@ -1381,12 +1383,16 @@ begin
                                 `OP_CLR,   n,       n,      `L2_VD_INVAL,  n,      `L2_MESI_I, n,      `L2_LRU_CLR};
                     end
                 end
-                `MSG_TYPE_L2_DIS_FLUSH_REQ, MSG_TYPE_RVCMO_FLUSH_REQ:
+                `MSG_TYPE_L2_DIS_FLUSH_REQ, `MSG_TYPE_RVCMO_INVAL_REQ, `MSG_TYPE_RVCMO_FLUSH_REQ:
                 begin
                     case (l2_way_state_mesi_S2)
                     `L2_MESI_I:
                     begin
+                        //       dir        dir      dir     data    data           mshr     state      state       state       msg
+                        //       clk_en     rdw_en   op      clk_en  rdw_en         wr_en    owner_en   owner_op    subline_en  data_ready
                         cs_S2 = {`L2_AMO_ALU_NOP, n,         rd,      `OP_CLR, y,      rd,            n,       n,         `OP_CLR,    n,          n,
+                        //       state       state   state   state          state    state           state   state
+                        //       subline_op  di_en   vd_en   vd             mesi_en  mesi            lru_en  lru
                                 `OP_CLR,   n,       y,      `L2_VD_INVAL,  n,      `L2_MESI_I, y,      `L2_LRU_CLR};
                     end
                     `L2_MESI_S:
@@ -1414,6 +1420,52 @@ begin
                         begin
                             cs_S2 = {`L2_AMO_ALU_NOP, n,         rd,      `OP_CLR, n,      rd,            y,       n,         `OP_CLR,    n,      n,
                                      `OP_CLR,   n,       n,      `L2_VD_INVAL,  n,      `L2_MESI_I, n,      `L2_LRU_CLR};
+                        end
+                    end
+                    default:
+                    begin
+                        cs_S2 = {`CS_SIZE_P1S2{1'bx}};
+                    end
+                    endcase
+
+                end
+                `MSG_TYPE_RVCMO_CLEAN_REQ:
+                begin
+                    case (l2_way_state_mesi_S2)
+                    `L2_MESI_I:
+                    begin
+                        //       dir        dir      dir     data    data           mshr     state      state       state       msg
+                        //       clk_en     rdw_en   op      clk_en  rdw_en         wr_en    owner_en   owner_op    subline_en  data_ready
+                        cs_S2 = {`L2_AMO_ALU_NOP, n,         rd,      `OP_CLR, y,      rd,            n,       n,         `OP_CLR,    n,          n,
+                        //       state       state   state   state          state    state           state   state
+                        //       subline_op  di_en   vd_en   vd             mesi_en  mesi            lru_en  lru
+                                `OP_CLR,   n,       y,      `L2_VD_INVAL,  n,      `L2_MESI_I, y,      `L2_LRU_CLR};
+                    end
+                    `L2_MESI_S:
+                    begin
+                        cs_S2 = {`L2_AMO_ALU_NOP, y,         rd,      `OP_CLR, n,      rd,            y,       n,         `OP_CLR,    n,      n,
+                                 `OP_CLR,   n,       n,      `L2_VD_CLEAN,  n,      `L2_MESI_I, n,      `L2_LRU_CLR};
+                    end
+                    `ifndef NO_RTL_CSM
+                    `L2_MESI_B:
+                    begin
+                        cs_S2 = {`L2_AMO_ALU_NOP, n,         rd,      `OP_CLR, n,      rd,            y,       n,         `OP_CLR,    n,      n,
+                                 `OP_CLR,   n,       n,      `L2_VD_CLEAN,  n,      `L2_MESI_I, n,      `L2_LRU_CLR};
+                    end
+                    `endif
+                    `L2_MESI_E:
+                    begin
+                        `ifndef NO_RTL_CSM
+                        if (csm_en)
+                        begin
+                            cs_S2 = {`L2_AMO_ALU_NOP, y,         rd,      `OP_CLR, n,      rd,            y,       n,         `OP_CLR,    n,      n,
+                                     `OP_CLR,   n,       n,      `L2_VD_CLEAN,  n,      `L2_MESI_I, n,      `L2_LRU_CLR};
+                        end
+                        else
+                        `endif
+                        begin
+                            cs_S2 = {`L2_AMO_ALU_NOP, n,         rd,      `OP_CLR, n,      rd,            y,       n,         `OP_CLR,    n,      n,
+                                     `OP_CLR,   n,       n,      `L2_VD_CLEAN,  n,      `L2_MESI_I, n,      `L2_LRU_CLR};
                         end
                     end
                     default:
@@ -3064,9 +3116,13 @@ begin
             else if (!l2_tag_hit_S4)
             begin
                 begin
-                    if (msg_type_S4_f == `MSG_TYPE_L2_DIS_FLUSH_REQ || msg_type_S4_f == `MSG_TYPE_L2_LINE_FLUSH_REQ || msg_type_S4_f == `MSG_TYPE_RVCMO_FLUSH_REQ)
+                    if (msg_type_S4_f == `MSG_TYPE_L2_DIS_FLUSH_REQ || msg_type_S4_f == `MSG_TYPE_L2_LINE_FLUSH_REQ)
                     begin
                         cs_S4 = {n,         y,          `MSG_TYPE_DATA_ACK,    n,          `MSG_TYPE_ERROR};
+                    end
+                    else if (msg_type_S4_f == `MSG_TYPE_RVCMO_INVAL_REQ || msg_type_S4_f == `MSG_TYPE_RVCMO_CLEAN_REQ || msg_type_S4_f == `MSG_TYPE_RVCMO_FLUSH_REQ)
+                    begin
+                        cs_S4 = {n,         y,          `MSG_TYPE_NODATA_ACK,    n,          `MSG_TYPE_ERROR};
                     end
                     else if (msg_type_S4_f == `MSG_TYPE_NC_STORE_REQ)
                     begin
@@ -3101,7 +3157,7 @@ begin
             else begin
             case (msg_type_S4_f)
                 //TODO
-                `MSG_TYPE_L2_DIS_FLUSH_REQ, `MSG_TYPE_L2_LINE_FLUSH_REQ, `MSG_TYPE_RVCMO_FLUSH_REQ:
+                `MSG_TYPE_L2_DIS_FLUSH_REQ, `MSG_TYPE_L2_LINE_FLUSH_REQ:
                 begin
                    case (l2_way_state_mesi_S4)
                     `L2_MESI_I:
@@ -3114,6 +3170,47 @@ begin
                         `L2_VD_DIRTY:
                         begin
                             cs_S4 = {n,         y,          `MSG_TYPE_DATA_ACK,    y,          `MSG_TYPE_STORE_MEM};
+                        end
+                        default:
+                        begin
+                            cs_S4 = {`CS_SIZE_S4{1'bx}};
+                        end
+                        endcase
+                    end
+                    `L2_MESI_S, `L2_MESI_B:
+                    begin
+                        cs_S4 = {y,         y,          `MSG_TYPE_INV_FWD,    n,          `MSG_TYPE_ERROR};
+                    end
+                    `L2_MESI_E:
+                    begin
+                        cs_S4 = {y,         y,          `MSG_TYPE_STORE_FWD,   n,          `MSG_TYPE_ERROR};
+                    end
+                    default:
+                    begin
+                        cs_S4 = {`CS_SIZE_S4{1'bx}};
+                    end
+                    endcase
+                end
+                `MSG_TYPE_RVCMO_INVAL_REQ, `MSG_TYPE_RVCMO_CLEAN_REQ, `MSG_TYPE_RVCMO_FLUSH_REQ:
+                begin
+                   case (l2_way_state_mesi_S4)
+                    `L2_MESI_I:
+                    begin
+                        case (l2_way_state_vd_S4)
+                        `L2_VD_CLEAN:
+                        begin
+                            cs_S4 = {n,         y,          `MSG_TYPE_NODATA_ACK,    n,          `MSG_TYPE_ERROR};
+                        end
+                        `L2_VD_DIRTY:
+                        begin
+                            if (msg_type_S4_f == `MSG_TYPE_RVCMO_CLEAN_REQ || msg_type_S4_f == `MSG_TYPE_RVCMO_FLUSH_REQ)
+                            begin
+                                cs_S4 = {n,         y,          `MSG_TYPE_NODATA_ACK,    y,          `MSG_TYPE_STORE_MEM};
+                            end
+                            else if (msg_type_S4_f == `MSG_TYPE_RVCMO_INVAL_REQ)
+                            begin
+                                cs_S4 = {n,         y,          `MSG_TYPE_NODATA_ACK,    n,          `MSG_TYPE_ERROR};
+                            end
                         end
                         default:
                         begin
