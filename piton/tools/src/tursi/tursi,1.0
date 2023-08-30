@@ -219,10 +219,6 @@ def makeDefList(options):
         defines.append("PITONSYS_UART_BOOT")
         defines.append("PITON_FPGA_BRAM_TEST")
 
-    # --asic-rtl option
-    if options.asic_rtl == True:
-        defines.append("PITON_ASIC_RTL")
-
     # --chip-bridge option
     if (options.board == "piton_board") and (options.design == "chipset"):
         pass

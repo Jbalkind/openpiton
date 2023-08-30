@@ -1982,11 +1982,7 @@ begin
         else
         `endif
         begin
-`ifdef PITON_ASIC_RTL
-            msg_send_dst_chipid_S4 = src_chipid_S4_f;
-`else
             msg_send_dst_chipid_S4 = my_nodeid_chipid_S4;
-`endif
             msg_send_dst_x_S4 = owner_x_S4;
             msg_send_dst_y_S4 = owner_y_S4;
         end

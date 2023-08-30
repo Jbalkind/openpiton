@@ -106,8 +106,6 @@ def usage():
     print("\n       --uart-reset", file=sys.stderr)
     print("              Attach UART traffic sniffer to the uart port. This sniffer will send", file=sys.stderr)
     print("              the reset signal to the whole system if it sees magic sequence 0x9a337213af278f34", file=sys.stderr)
-    print("\n       --asic-rtl", file=sys.stderr)
-    print("              Implement design with ASIC RTL.", file=sys.stderr)
     print("\n       --chip-bridge", file=sys.stderr)
     print("              Implement full system including the chip bridge", file=sys.stderr)
     print("\n       --inc-passthru", file=sys.stderr)
@@ -464,7 +462,6 @@ def setParserOptions(parser):
     parser.add_option("--eth", dest="eth", action="store_true", default=False)
     parser.add_option("--uart-dmw", dest="uart_dmw", action="store", default=None)
     parser.add_option("--uart-reset", dest="uart_reset", action="store_true", default=False)
-    parser.add_option("--asic-rtl", dest="asic_rtl", action="store_true", default=False)
     parser.add_option("--chip-bridge", dest="chip_bridge", action="store_true", default=False)
     parser.add_option("--inc-passthru", dest="inc_passthru", action="store_true", default=False)
     parser.add_option("--passthru-dec", dest="passthru_dec", action="store_true", default=False)
@@ -533,10 +530,6 @@ def makeDefList(options):
 
     if options.uart_reset == True:
         defines.append("PITONSYS_UART_RESET")
-
-    # --asic-rtl option
-    if options.asic_rtl == True:
-        defines.append("PITON_ASIC_RTL")
 
     # --chip-bridge option
     if (options.board == "piton_board") and (options.design == "chipset"):

@@ -385,11 +385,7 @@ end
 // retrieve mshr info from mshr module
 // and expanding signals
 reg [`L15_NUM_MSHRID_PER_THREAD-1:0] mshr_val_array [`L15_THREAD_ARRAY_MASK];
-`ifdef PITON_ASIC_RTL
-reg [`L15_MESI_TRANS_STATE_WIDTH:0] mshr_st_state_array [`L15_THREAD_ARRAY_MASK];
-`else
 reg [`L15_MESI_TRANS_STATE_WIDTH-1:0] mshr_st_state_array [`L15_THREAD_ARRAY_MASK];
-`endif
 reg [`L15_PADDR_MASK] mshr_st_address_array [`L15_THREAD_ARRAY_MASK];
 reg [`L15_PADDR_MASK] mshr_ld_address_array [`L15_THREAD_ARRAY_MASK];
 reg [`L15_WAY_MASK] mshr_st_way_array [`L15_THREAD_ARRAY_MASK];
@@ -1313,9 +1309,7 @@ begin
                     decoder_mshr_allocation_type_s1 = `L15_MSHR_ID_ST;
                     decoder_csm_op_s1 = `L15_CSM_OP_READ_GHID;
                     decoder_noc1_operation_s1 = `L15_NOC1_GEN_DATA_WRITETHROUGH_REQUEST_FROM_PCX;
-`ifndef PITON_ASIC_RTL
-                    decoder_s3_mshr_operation_s1 = `L15_S3_MSHR_OP_UPDATE_ST_MSHR_WAIT_ACK;
-`endif                    
+                    decoder_s3_mshr_operation_s1 = `L15_S3_MSHR_OP_UPDATE_ST_MSHR_WAIT_ACK;                   
                     // decoder_creditman_req_8B_s1 = 1'b1;
                     // decoder_creditman_noc1_needed = 2'd1;
                 end
@@ -1557,11 +1551,7 @@ begin
             decoder_wmt_read_op_s1 = `L15_WMT_READ;
             decoder_wmt_write_op_s1 = `L15_WMT_DEMAP_TAGCHECK_WAY_IF_MES;
             // decoder_wmt_compare_op_s1 = `L15_WMT_COMPARE_LRU;
-`ifdef PITON_ASIC_RTL
-            decoder_wmt_compare_op_s1 = `L15_WMT_COMPARE_LRU;
-`else
             decoder_wmt_compare_op_s1 = `L15_WMT_COMPARE_TAGCHECK; // bug 3/28/16
-`endif            
 
             decoder_cpx_operation_s1 = `L15_CPX_GEN_DCACHE_INVALIDATION;
         end // todo
@@ -1672,12 +1662,7 @@ begin
                 // decoder_wmt_operation_s1 = `L15_WMT_WRITE_LRU_WAY_L1_REPL_AND_DEMAP_ENTRY;
                 decoder_wmt_read_op_s1 = `L15_WMT_READ;
                 decoder_wmt_write_op_s1 = `L15_WMT_UPDATE_LRU_WAY_AND_DEDUP_ENTRY;
-`ifdef PITON_ASIC_RTL
-                decoder_wmt_compare_op_s1 = `L15_WMT_COMPARE_TAGCHECK;
-`else
-                // decoder_wmt_compare_op_s1 = `L15_WMT_COMPARE_TAGCHECK; // bug fix 3/28/16                
                 decoder_wmt_compare_op_s1 = `L15_WMT_COMPARE_LRU;
-`endif                
                 decoder_lruarray_write_op_s1 = `L15_LRU_REPLACEMENT;
                 decoder_cpx_operation_s1 = `L15_CPX_GEN_LD_RESPONSE_FROM_NOC2;
                 `ifndef NO_RTL_CSM
@@ -1811,12 +1796,7 @@ begin
                 decoder_wmt_read_op_s1 = `L15_WMT_READ;
                 // L1 won't save the line after an LR, so L15 should not update the wmt
                 //decoder_wmt_write_op_s1 = `L15_WMT_UPDATE_LRU_WAY_AND_DEDUP_ENTRY;
-`ifdef PITON_ASIC_RTL
-                decoder_wmt_compare_op_s1 = `L15_WMT_COMPARE_TAGCHECK;   
-`else
-                // decoder_wmt_compare_op_s1 = `L15_WMT_COMPARE_TAGCHECK; // bug fix 3/28/16
                 decoder_wmt_compare_op_s1 = `L15_WMT_COMPARE_LRU;
-`endif
                 decoder_lruarray_write_op_s1 = `L15_LRU_REPLACEMENT;
                 decoder_cpx_operation_s1 = `L15_CPX_GEN_ATOMIC_ACK_FROM_NOC2;
                 `ifndef NO_RTL_CSM
@@ -3302,21 +3282,13 @@ reg [`L15_UNPARAM_1_0] stbuf_way_s3; // wmt todo: move calculation to s2
 // STORE BUFFER STUFF
 always @ *
 begin
-`ifdef PITON_ASIC_RTL
-    stbuf_compare_address_match_s3[0] = mshr_st_address_array[0][10:4] == cache_index_s3;
-`else
     stbuf_compare_address_match_s3[0] = mshr_st_address_array[0][39:4] == address_s3[39:4];
-`endif
     stbuf_compare_match_s3[0] = mshr_val_array[0][`L15_MSHR_ID_ST] 
                                 && (mshr_st_state_array[0] == `L15_MESI_TRANSITION_STATE_SM) 
                                 && (stbuf_compare_address_match_s3[0] == 1'b1);
     stbuf_compare_lru_match_s3[0] = stbuf_compare_match_s3[0] && (mshr_st_way_array[0] == lru_way_s3);
 
-`ifdef PITON_ASIC_RTL
-    stbuf_compare_address_match_s3[1] = mshr_st_address_array[1][10:4] == cache_index_s3;
-`else
     stbuf_compare_address_match_s3[1] = mshr_st_address_array[1][39:4] == address_s3[39:4];
-`endif
     stbuf_compare_match_s3[1] = mshr_val_array[1][`L15_MSHR_ID_ST] 
                                 && (mshr_st_state_array[1] == `L15_MESI_TRANSITION_STATE_SM) 
                                 && (stbuf_compare_address_match_s3[1] == 1'b1);

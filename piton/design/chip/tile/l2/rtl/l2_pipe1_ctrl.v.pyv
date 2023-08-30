@@ -3743,11 +3743,7 @@ begin
         begin
             msg_send_mode_S4 = `L2_P1_BUF_OUT_MODE_3H0D;
             msg_send_length_S4 = `MSG_LENGTH_WIDTH'd2;
-`ifdef PITON_ASIC_RTL
-            msg_send_data_size_S4 = `MSG_DATA_SIZE_64B;
-`else
             msg_send_data_size_S4 = data_size_S4_f;
-`endif
             msg_send_cache_type_S4 = `MSG_CACHE_TYPE_DATA;
             msg_send_mshrid_S4 = mshr_wr_index_in_S4;
         end
@@ -3755,11 +3751,8 @@ begin
         begin
             msg_send_mode_S4 = `L2_P1_BUF_OUT_MODE_3H0D;
             msg_send_length_S4 = `MSG_LENGTH_WIDTH'd2;
-`ifdef PITON_ASIC_RTL
             msg_send_data_size_S4 = `MSG_DATA_SIZE_16B;
-`else
             msg_send_data_size_S4 = data_size_S4_f;
-`endif
 
 `ifndef NO_RTL_CSM
             if (smc_miss_S4)
@@ -3791,11 +3784,7 @@ begin
         `MSG_TYPE_STORE_MEM:
         begin
             msg_send_length_S4 = `MSG_LENGTH_WIDTH'd10;
-`ifdef PITON_ASIC_RTL
-            msg_send_data_size_S4 = `MSG_DATA_SIZE_64B;
-`else
             msg_send_data_size_S4 = data_size_S4_f;
-`endif
             msg_send_cache_type_S4 = `MSG_CACHE_TYPE_DATA;
             msg_send_mshrid_S4 = mshr_wr_index_in_S4;
             if (l2_load_data_subline_S4_f == `L2_DATA_SUBLINE_0)
