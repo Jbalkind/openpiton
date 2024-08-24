@@ -407,7 +407,6 @@ set CHIP_RTL_IMPL_FILES [list \
     "${DV_ROOT}/design/chip/tile/ariane/corev_apu/tb/ariane_axi_pkg.sv"                            \
     "${DV_ROOT}/design/chip/tile/ariane/core/include/wt_cache_pkg.sv"                              \
     "${DV_ROOT}/design/chip/tile/ariane/corev_apu/tb/axi_intf.sv"                                  \
-    "${DV_ROOT}/design/chip/tile/ariane/core/include/cvxif_pkg.sv" \
     "${DV_ROOT}/design/chip/tile/ariane/vendor/pulp-platform/common_cells/src/cf_math_pkg.sv" \
     "${DV_ROOT}/design/chip/tile/ariane/core/cvxif_example/include/cvxif_instr_pkg.sv" \
     "${DV_ROOT}/design/chip/tile/ariane/core/acc_dispatcher.sv" \
@@ -427,11 +426,11 @@ set CHIP_RTL_IMPL_FILES [list \
     "${DV_ROOT}/design/chip/tile/ariane/vendor/pulp-platform/common_cells/src/unread.sv"                       \
     "${DV_ROOT}/design/chip/tile/ariane/vendor/pulp-platform/common_cells/src/popcount.sv"                     \
     "${DV_ROOT}/design/chip/tile/ariane/corev_apu/axi_mem_if/src/axi2mem.sv"                                \
-    "${DV_ROOT}/design/chip/tile/ariane/corev_apu/src/tech_cells_generic/src/fpga/tc_clk_xilinx.sv"         \
-    "${DV_ROOT}/design/chip/tile/ariane/corev_apu/src/tech_cells_generic/src/fpga/tc_sram_xilinx.sv"        \
-    "${DV_ROOT}/design/chip/tile/ariane/corev_apu/src/tech_cells_generic/src/deprecated/cluster_clk_cells.sv" \
-    "${DV_ROOT}/design/chip/tile/ariane/corev_apu/src/tech_cells_generic/src/deprecated/pulp_clk_cells.sv" \
-    "${DV_ROOT}/design/chip/tile/ariane/corev_apu/fpga-support/rtl/SyncSpRamBeNx64.sv" \
+    "${DV_ROOT}/design/chip/tile/ariane/vendor/pulp-platform/tech_cells_generic/src/fpga/tc_clk_xilinx.sv"         \
+    "${DV_ROOT}/design/chip/tile/ariane/vendor/pulp-platform/tech_cells_generic/src/fpga/tc_sram_xilinx.sv"        \
+    "${DV_ROOT}/design/chip/tile/ariane/vendor/pulp-platform/tech_cells_generic/src/deprecated/cluster_clk_cells.sv" \
+    "${DV_ROOT}/design/chip/tile/ariane/vendor/pulp-platform/tech_cells_generic/src/deprecated/pulp_clk_cells.sv" \
+    "${DV_ROOT}/design/chip/tile/ariane/vendor/pulp-platform/fpga-support/rtl/SyncSpRamBeNx64.sv" \
     "${DV_ROOT}/design/chip/tile/ariane/common/local/util/tc_sram_fpga_wrapper.sv"           \
     "${DV_ROOT}/design/chip/tile/ariane/common/local/util/sram.sv"                                     \
     "${DV_ROOT}/design/chip/tile/ariane/common/local/util/sram_cache.sv"                                     \
@@ -543,6 +542,8 @@ set CHIP_RTL_IMPL_FILES [list \
     "${DV_ROOT}/design/chip/tile/ariane/common/submodules/common_cells/src/counter.sv" \
     "${DV_ROOT}/design/chip/tile/ariane/common/submodules/common_cells/src/delta_counter.sv" \
     "${DV_ROOT}/design/chip/tile/ariane/core/cvxif_fu.sv" \
+    "${DV_ROOT}/design/chip/tile/ariane/core/cvxif_issue_register_commit_if_driver.sv" \
+    "${DV_ROOT}/design/chip/tile/ariane/core/cvxif_compressed_if_driver.sv" \
 ]
 
 set CHIP_INCLUDE_FILES [list \
