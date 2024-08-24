@@ -743,18 +743,10 @@ end
 `ifndef MINIMAL_MONITORING
 always @(posedge clk) begin
     if (noc_valid_in & noc_ready_in) begin
-`ifdef VERILATOR
-        $display("FakeMem: input: %h", noc_data_in);
-`else
         $display("FakeMem: input: %h", noc_data_in, $time);
-`endif
     end
     if (noc_valid_out & noc_ready_out) begin
-`ifdef VERILATOR
-        $display("FakeMem: output %h", noc_data_out);
-`else
         $display("FakeMem: output %h", noc_data_out, $time);
-`endif
     end
 end
 `endif // endif MINIMAL_MONITORING

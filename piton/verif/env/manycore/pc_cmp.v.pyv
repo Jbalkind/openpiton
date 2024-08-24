@@ -449,9 +449,7 @@ always @(posedge clk)begin
                            (hit_bad == 0))
                         begin
                             local_diag_done = 1;
-                            `ifndef VERILATOR
                             @(posedge clk);
-                            `endif
                             $display("%0d: Simulation -> PASS (HIT GOOD TRAP)", $time);
                             $finish;
                         end

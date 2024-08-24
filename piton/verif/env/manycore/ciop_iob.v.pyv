@@ -253,9 +253,7 @@ print(tt)
         if (iob_buffer_val && (out_buffer_val[out_write_index] | out_buffer_val[out_write_index + 1] == 1'b1))
         begin
             $display("%d : Simulation -> FAIL(%0s)", $time, "ciop_iob.v: IOB out buffer overflowed");
-            `ifndef VERILATOR
             repeat(5)@(posedge clk);
-            `endif
 `ifndef DISABLE_ALL_MONITORS
             `MONITOR_PATH.fail("ciop_iob.v: IOB out buffer overflowed");
 `endif

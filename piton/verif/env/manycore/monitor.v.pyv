@@ -51,11 +51,7 @@ module monitor(/*AUTOARG*/
 	num    = 0;
 	err_f  = 1;
 	bad    = 0;
-`ifndef VERILATOR
 	max_cycle = 30000;
-`else // ifndef VERILATOR
-	max_cycle = 1500000;
-`endif // ifndef VERILATOR
 	cycle  = 0;
 	if($value$plusargs("wait_cycle_to_kill=%d", number))$display("wait cycles = %d", number);
 	if($value$plusargs("max_cycle=%d", max_cycle))$display("max cycles = %d", max_cycle);
@@ -1178,9 +1174,7 @@ module monitor(/*AUTOARG*/
         if (`SPARC_CORE0.sparc0.lsu.lsu.qctl2.dfq_vld_en && (`SPARC_CORE0.sparc0.lsu.lsu.qctl2.lsu_cpu_inv_data_val === 1'bx))
         begin
             $display("%d : Simulation -> FAIL(%0s)", $time, "TILE0 lsu received X invalidation");
-            `ifndef VERILATOR
             repeat(5)@(posedge clk);
-            `endif
             `MONITOR_PATH.fail("TILE0 lsu received X invalidation");
         end
 
@@ -1190,9 +1184,7 @@ module monitor(/*AUTOARG*/
             if (|`SPARC_CORE0.sparc0.lsu.lsu.qctl2.lsu_cpu_inv_data_way === 1'bx)
             begin
                 $display("%d : Simulation -> FAIL(%0s)", $time, "TILE0 lsu received invalid way invalidation");
-                `ifndef VERILATOR
                 repeat(5)@(posedge clk);
-                `endif
                 `MONITOR_PATH.fail("TILE0 lsu received invalid way invalidation");
             end
         end

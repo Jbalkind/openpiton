@@ -1515,8 +1515,7 @@ sub generic_sim_build
     }
 	
     if ($opt{vlt_build}) {
-      $build_cmd = "verilator -cc " ;
-      $build_cmd .= "-exe $dv_root/tools/verilator/my_top.cpp " ;
+      $build_cmd = "verilator -cc --main --timing -exe --build -j 8 " ;
       $build_cmd .= "$dv_root/tools/pli/iop/b_ary.c " ;
       $build_cmd .= "$dv_root/tools/pli/iop/bw_lib.c " ;
       $build_cmd .= "$dv_root/tools/pli/iop/iob_main.cc " ;
@@ -1533,7 +1532,6 @@ sub generic_sim_build
       $build_cmd .= "-CFLAGS -DPITON_DPI " ;
       #$build_cmd .= "-CFLAGS -lstdc++ " ;
       $build_cmd .= "-CFLAGS -I$dv_root/tools/pli/iop " ;
-      $build_cmd .= "-CFLAGS -I$dv_root/tools/verilator " ;
     }
     if ($opt{other_sim_build}) {
       if (($opt{other_sim_build_cmd}) eq "") {
@@ -1570,17 +1568,6 @@ sub generic_sim_build
     if (! $opt{dryrun}) {
       system ($build_cmd) ;
       die ("DIE. failed building model") if ($?) ;
-    }
-
-    if ($opt{vlt_build}) {
-      $build_cmd = "make -j -C $model_path/obj_dir -f Vcmp_top.mk Vcmp_top" ;
-
-      print "$prg: $build_cmd\n";
-
-      if (! $opt{dryrun}) {
-        system ($build_cmd) ;
-        die ("DIE. failed building model") if ($?) ;
-      }
     }
 
     # go back to where the script was invoked
