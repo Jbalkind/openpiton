@@ -2300,10 +2300,17 @@ sub assemble_diag
         foreach my $additional_args (@{$opt{gcc_args}}) {
           $defs .= " ${additional_args}";
         }
-        my $cmd = "rv64_cc ${diag_name} \"$defs\"" ;
-        print "$prg: $cmd\n";
-        my $waitstatus = call_program($cmd, "rv64_cc.log");
-        die ("DIE. rv64_cc compilation error") if ($waitstatus) ;
+        if ($diag_name eq "diag.S") {
+          my $cmd = "rv64_as ${diag_name} \"$defs\"" ;
+          print "$prg: $cmd\n";
+          my $waitstatus = call_program($cmd, "rv64_as.log");
+          die ("DIE. rv64_as compilation error") if ($waitstatus) ;
+        } else {
+          my $cmd = "rv64_cc ${diag_name} \"$defs\"" ;
+          print "$prg: $cmd\n";
+          my $waitstatus = call_program($cmd, "rv64_cc.log");
+          die ("DIE. rv64_cc compilation error") if ($waitstatus) ;
+        }
       }
 
       my $cmd = "rv64_img" ;

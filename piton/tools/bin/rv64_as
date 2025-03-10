@@ -11,21 +11,19 @@
 #
 # Author: Michael Schaffner <schaffner@iis.ee.ethz.ch>, ETH Zurich
 # Date: 15.08.2018
-# Description: mem image assembly script for rv64 targets
+# Description: compilation script for rv64 targets
+#
+# The first argument is the path to the asm program to be compiled, 
+# second argument can be used to pass additional arguments to GCC.
 
-# create mem.image
-${RV64_TARGET_TRIPLE}-objcopy -I elf64-littleriscv -O binary diag.exe diag.o
-# pad with zero to 128byte boundary
-du diag.o -b | awk '{print(128 - ($1 % 128));}' | xargs -t -ISIZE truncate diag.o -s +SIZE
-printf "\n@0000000080000000\t// Section '.RED_SEC', segment 'text'\n" > mem.image
-xxd -g 16 -c 32 diag.o | awk '{printf("%s %s\n", $2, $3);}' >> mem.image
+# Todo: upgrade from IMAC -> IMACFD when FP is available
+RISCV_GCC=${RV64_TARGET_TRIPLE}-gcc
+RISCV_GCC_OPTS="-march=${RV64_MARCH} -mabi=${RV64_MABI} -DPREALLOCATE=1 -mcmodel=medany -static -std=gnu99 -O2 -fno-common -fno-builtin-printf $2"
+RISCV_LINK_OPTS="-static -nostdlib -nostartfiles -lm -lgcc -T ${DV_ROOT}/verif/diag/assembly/include/riscv/${RV64_CORE}/link.ld"
 
-#create symbol.tbl
-${RV64_TARGET_TRIPLE}-objdump -d diag.exe | grep "<pass>:" | awk '{printf("good_trap %s X %s\n", $1, $1);}' >symbol.tbl
-${RV64_TARGET_TRIPLE}-objdump -d diag.exe | grep "<fail>:" | awk '{printf("bad_trap %s X %s\n", $1, $1);}' >>symbol.tbl
-${RV64_TARGET_TRIPLE}-objdump -d diag.exe --disassemble-all --disassemble-zeroes --section=.text --section=.text.startup --section=.text.init --section=.data  > diag.dump
+# $(src_dir)/../env -I$(src_dir)/common $(addprefix -I$(src_dir)/, $(bmarks))
+INCS="-I${DV_ROOT}/verif/diag/assembly/include/riscv/rv64"
 
-#create empty diag.ev
-touch diag.ev
-
+${RISCV_GCC} ${INCS} ${RISCV_GCC_OPTS} -o diag.exe $1                        \
+             ${RISCV_LINK_OPTS}
 
