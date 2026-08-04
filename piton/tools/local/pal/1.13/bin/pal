@@ -206,8 +206,9 @@ sub initialize {
 
     $infile=	 shift(@ARGV);
     my($name)= &basename($infile);
-    $infile_pp=  "/usr/tmp/$name.$$.pp";	#after preprocess
-    $infile_pl=  "/usr/tmp/$name.$$.pl";	#after xlating to perl
+    my($tmp)=  $ENV{DRMJOBSCRATCHSPACE} || (-d "/var/tmp" ? "/var/tmp" : "/tmp");
+    $infile_pp=  "$tmp/$name.$$.pp";	#after preprocess
+    $infile_pl=  "$tmp/$name.$$.pl";	#after xlating to perl
 
 ##  & process_cmdline()	if($#ARGV >= 0);	#after input file
 #   & EXIT(1, "Cmd-Line error")	if($#ARGV >= 0) ;

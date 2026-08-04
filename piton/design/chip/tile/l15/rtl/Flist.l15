@@ -49,4 +49,3 @@ sram_wrappers/sram_l15_tag.v
 sram_wrappers/sram_l15_data.v
 sram_wrappers/sram_l15_hmt.v
 
-l15_pkg.sv

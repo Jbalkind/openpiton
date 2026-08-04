@@ -359,6 +359,7 @@ if ((!$opt{pico} && !$opt{ariane} && !$opt{ost1}) && ($opt{sys} eq "manycore")) 
 push (@{$opt{config_cpp_args}}, "-DFLIST_OST1")     if ($opt{ost1} || $opt{pico_het}) ;
 push (@{$opt{config_cpp_args}}, "-DFLIST_PICO")     if ($opt{pico} || $opt{pico_het}) ;
 push (@{$opt{config_cpp_args}}, "-DFLIST_ARIANE")   if ($opt{ariane}) ;
+push (@{$opt{config_cpp_args}}, "-DFLIST_HPDC")     if ($opt{ariane} && $opt{hpdc}) ;
 push (@{$opt{config_cpp_args}}, "-DFLIST_ORAM")     if ($opt{oram}) ;
 
 push (@{$opt{diaglist_cpp_args}}, "-DSPARCV9")      if ($opt{ost1} || $opt{pico_het}) ;
@@ -925,6 +926,7 @@ sub regress
       }
       $cmd .= "-ost1 " if $opt{ost1} ;
       $cmd .= "-ariane " if $opt{ariane} ;
+      $cmd .= "-hpdc " if $opt{hpdc} ;
       $cmd .= "-pico " if $opt{pico} ;
       $cmd .= "-pico_het " if $opt{pico_het} ;
       $cmd .= "$buildargs " ;
@@ -1162,7 +1164,7 @@ sub gen_flist
         next ;
       }
 
-      $line =~ s/\${?(\w+)}?/$ENV{$1}/g ;
+      $line =~ s/\$\{?(\w+)\}?/$ENV{$1}/g ;
 
       if ($line =~ /^\+incdir\+\//)
       { }
@@ -1556,7 +1558,7 @@ sub generic_sim_build
       $build_cmd .= "--unroll-count 256 " ;
       $build_cmd .= "-CFLAGS -DVERILATOR " ;
       $build_cmd .= "-CFLAGS -DPITON_DPI " ;
-      $build_cmd .= "-CFLAGS -lstdc++ " ;
+      $build_cmd .= "-LDFLAGS -lstdc++ " ;
       $build_cmd .= "-CFLAGS -I$dv_root/tools/pli/iop " ;
       $build_cmd .= "-CFLAGS -I$dv_root/tools/verilator " ;
 

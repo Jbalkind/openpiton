@@ -28,7 +28,7 @@
 # Not intended to be run standalone
 #
 
-set GLOBAL_INCLUDE_DIRS "${DV_ROOT}/design/include ${DV_ROOT}/design/chip/tile/sparc/include ${DV_ROOT}/design/chipset/include ${ARIANE_ROOT}/common/submodules/common_cells/include ${ARIANE_ROOT}/common/local/util ${ARIANE_ROOT}/corev_apu/register_interface/include"
+set GLOBAL_INCLUDE_DIRS "${DV_ROOT}/design/include ${DV_ROOT}/design/chip/tile/sparc/include ${DV_ROOT}/design/chipset/include ${ARIANE_ROOT}/core/include ${ARIANE_ROOT}/vendor/pulp-platform/common_cells/include ${ARIANE_ROOT}/common/local/util ${ARIANE_ROOT}/corev_apu/register_interface/include ${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/include"
 
 # RTL include files
 set GLOBAL_INCLUDE_FILES [list \
@@ -389,49 +389,110 @@ set CHIP_RTL_IMPL_FILES [list \
     "${OST1_ROOT}/srams/rtl/sram_wrappers/sram_l1i_tag.v" \
     "${DV_ROOT}/design/chipset/rv64_platform/bootrom/baremetal/bootrom.sv"                    \
     "${DV_ROOT}/design/chipset/rv64_platform/bootrom/linux/bootrom_linux.sv"                  \
-    "${ARIANE_ROOT}/core/include/cv64a6_imafdc_sv39_config_pkg.sv" \
+    "${ARIANE_ROOT}/core/include/cv64a6_imafdc_sv39_openpiton_config_pkg.sv" \
+    "${ARIANE_ROOT}/core/include/dummy_l15_pkg.sv"                                 \
+    "${ARIANE_ROOT}/core/include/config_pkg.sv"                                 \
+    "${ARIANE_ROOT}/core/include/build_config_pkg.sv"                                 \
     "${ARIANE_ROOT}/core/include/riscv_pkg.sv"                                 \
-    "${ARIANE_ROOT}/corev_apu/riscv-dbg/src/dm_pkg.sv"                          \
     "${ARIANE_ROOT}/core/include/ariane_pkg.sv"                                \
     "${ARIANE_ROOT}/corev_apu/tb/ariane_soc_pkg.sv"                                 \
-    "${ARIANE_ROOT}/corev_apu/axi/src/axi_pkg.sv"                               \
-    "${ARIANE_ROOT}/core/include/ariane_axi_pkg.sv"                            \
+    "${ARIANE_ROOT}/vendor/pulp-platform/axi/src/axi_pkg.sv"                               \
+    "${ARIANE_ROOT}/corev_apu/tb/ariane_axi_pkg.sv"                            \
     "${ARIANE_ROOT}/core/include/wt_cache_pkg.sv"                              \
-    "${ARIANE_ROOT}/core/include/axi_intf.sv"                                  \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_pkg.sv"                             \
-    "${ARIANE_ROOT}/core/include/cvxif_pkg.sv" \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/cf_math_pkg.sv" \
+    "${ARIANE_ROOT}/corev_apu/tb/axi_intf.sv"                                  \
+    "${ARIANE_ROOT}/corev_apu/riscv-dbg/src/dm_pkg.sv"                             \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_pkg.sv"                             \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/cf_math_pkg.sv" \
     "${ARIANE_ROOT}/core/cvxif_example/include/cvxif_instr_pkg.sv" \
     "${ARIANE_ROOT}/corev_apu/rv_plic/rtl/rv_plic_reg_pkg.sv" \
     "${ARIANE_ROOT}/common/local/util/sram.sv"                                     \
-    "${ARIANE_ROOT}/common/local/util/axi_master_connect.sv"                       \
-    "${ARIANE_ROOT}/common/local/util/axi_master_connect_rev.sv"                   \
-    "${ARIANE_ROOT}/common/local/util/axi_slave_connect.sv"                        \
-    "${ARIANE_ROOT}/common/local/util/axi_slave_connect_rev.sv"                    \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/deprecated/rrarbiter.sv"         \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/deprecated/fifo_v1.sv"           \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/deprecated/fifo_v2.sv"           \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/fifo_v3.sv"                      \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/shift_reg.sv"                    \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/lfsr_8bit.sv"                    \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/lfsr.sv"                         \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/lzc.sv"                          \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/exp_backoff.sv"                  \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/rr_arb_tree.sv"                  \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/rstgen_bypass.sv"                \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/cdc_2phase.sv"                   \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/unread.sv"                       \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/popcount.sv"                     \
+    "${ARIANE_ROOT}/common/local/util/sram_cache.sv"                                     \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_pkg.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/cva6_hpdcache_wrapper.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/cva6_hpdcache_subsystem.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/cva6_hpdcache_subsystem_axi_arbiter.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/cva6_hpdcache_subsystem_l15_adapter.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/cva6_hpdcache_if_adapter.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/macros/behav/hpdcache_sram_1rw.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/macros/behav/hpdcache_sram_wbyteenable_1rw.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/macros/behav/hpdcache_sram_wmask_1rw.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_l15_req_arbiter.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_l15_resp_demux.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_to_l15.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_mem_req_read_arbiter.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_mem_resp_demux.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_mem_req_write_arbiter.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_mem_to_axi_write.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_mem_to_axi_read.sv"                             \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_pkg.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_demux.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_lfsr.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_sync_buffer.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_fifo_reg.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_fifo_reg_initialized.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_fxarb.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_rrarb.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_mux.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_decoder.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_1hot_to_binary.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_prio_1hot_encoder.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_prio_bin_encoder.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_sram.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_sram_wbyteenable.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_sram_wmask.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_regbank_wbyteenable_1rw.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_regbank_wmask_1rw.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_data_downsize.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_data_upsize.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_data_resize.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hwpf_stride/hwpf_stride_pkg.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hwpf_stride/hwpf_stride.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hwpf_stride/hwpf_stride_arb.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hwpf_stride/hwpf_stride_wrapper.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_amo.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_cmo.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_core_arbiter.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_ctrl.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_ctrl_pe.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_memctrl.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_cbuf.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_miss_handler.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_mshr.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_rtab.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_uncached.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_victim_plru.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_victim_random.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_victim_sel.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_wbuf.sv" \
+    "${ARIANE_ROOT}/core/cache_subsystem/hpdcache/rtl/src/hpdcache_flush.sv" \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/deprecated/rrarbiter.sv"         \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/deprecated/fifo_v1.sv"           \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/deprecated/fifo_v2.sv"           \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/fifo_v3.sv"                      \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/shift_reg.sv"                    \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/lfsr_8bit.sv"                    \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/lfsr.sv"                         \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/lzc.sv"                          \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/exp_backoff.sv"                  \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/rr_arb_tree.sv"                  \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/rstgen_bypass.sv"                \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/cdc_2phase.sv"                   \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/unread.sv"                       \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/popcount.sv"                     \
     "${ARIANE_ROOT}/corev_apu/axi_mem_if/src/axi2mem.sv"                                \
-    "${ARIANE_ROOT}/corev_apu/src/tech_cells_generic/src/fpga/tc_clk_xilinx.sv"         \
-    "${ARIANE_ROOT}/corev_apu/src/tech_cells_generic/src/fpga/tc_sram_xilinx.sv"        \
-    "${ARIANE_ROOT}/corev_apu/src/tech_cells_generic/src/deprecated/cluster_clk_cells.sv" \
-    "${ARIANE_ROOT}/corev_apu/src/tech_cells_generic/src/deprecated/pulp_clk_cells.sv" \
-    "${ARIANE_ROOT}/common/local/util/tc_sram_xilinx_wrapper.sv"           \
-    "${ARIANE_ROOT}/core/axi_adapter.sv"                                   \
+    "${ARIANE_ROOT}/vendor/pulp-platform/tech_cells_generic/src/fpga/tc_clk_xilinx.sv"         \
+    "${ARIANE_ROOT}/vendor/pulp-platform/tech_cells_generic/src/fpga/tc_sram_xilinx.sv"        \
+    "${ARIANE_ROOT}/vendor/pulp-platform/fpga-support/rtl/SyncSpRamBeNx64.sv" \
+    "${ARIANE_ROOT}/vendor/pulp-platform/tech_cells_generic/src/deprecated/cluster_clk_cells.sv" \
+    "${ARIANE_ROOT}/vendor/pulp-platform/tech_cells_generic/src/deprecated/pulp_clk_cells.sv" \
+    "${ARIANE_ROOT}/common/local/util/tc_sram_fpga_wrapper.sv"           \
+    "${ARIANE_ROOT}/core/cache_subsystem/axi_adapter.sv"                                   \
     "${ARIANE_ROOT}/core/alu.sv"                                           \
+    "${ARIANE_ROOT}/core/alu_wrapper.sv"                                           \
     "${ARIANE_ROOT}/core/fpu_wrap.sv"                                      \
-    "${ARIANE_ROOT}/core/ariane.sv"                                        \
+    "${ARIANE_ROOT}/corev_apu/src/ariane.sv"                                        \
+    "${ARIANE_ROOT}/core/cva6_rvfi_probes.sv"                                        \
     "${ARIANE_ROOT}/core/cva6.sv"                                        \
     "${ARIANE_ROOT}/core/branch_unit.sv"                                   \
     "${ARIANE_ROOT}/core/compressed_decoder.sv"                            \
@@ -453,19 +514,21 @@ set CHIP_RTL_IMPL_FILES [list \
     "${ARIANE_ROOT}/core/load_unit.sv"                                     \
     "${ARIANE_ROOT}/core/load_store_unit.sv"                               \
     "${ARIANE_ROOT}/core/lsu_bypass.sv"                                    \
-    "${ARIANE_ROOT}/core/mmu_sv39/mmu.sv"                                           \
+    "${ARIANE_ROOT}/core/cva6_mmu/cva6_shared_tlb.sv"                      \
+    "${ARIANE_ROOT}/core/cva6_mmu/cva6_mmu.sv"                      \
     "${ARIANE_ROOT}/core/mult.sv"                                          \
     "${ARIANE_ROOT}/core/multiplier.sv"                                    \
     "${ARIANE_ROOT}/core/serdiv.sv"                                        \
     "${ARIANE_ROOT}/core/perf_counters.sv"                                 \
-    "${ARIANE_ROOT}/core/mmu_sv39/ptw.sv"                                           \
+    "${ARIANE_ROOT}/core/cva6_mmu/cva6_ptw.sv"                             \
     "${ARIANE_ROOT}/core/ariane_regfile_ff.sv"                             \
-    "${ARIANE_ROOT}/core/re_name.sv"                                       \
     "${ARIANE_ROOT}/core/scoreboard.sv"                                    \
+    "${ARIANE_ROOT}/core/raw_checker.sv"                                    \
     "${ARIANE_ROOT}/core/store_buffer.sv"                                  \
+    "${ARIANE_ROOT}/core/cva6_fifo_v3.sv"                      \
     "${ARIANE_ROOT}/core/amo_buffer.sv"                                    \
     "${ARIANE_ROOT}/core/store_unit.sv"                                    \
-    "${ARIANE_ROOT}/core/mmu_sv39/tlb.sv"                                           \
+    "${ARIANE_ROOT}/core/cva6_mmu/cva6_tlb.sv"                                           \
     "${ARIANE_ROOT}/core/commit_stage.sv"                                  \
     "${ARIANE_ROOT}/core/cache_subsystem/wt_dcache_ctrl.sv"                \
     "${ARIANE_ROOT}/core/cache_subsystem/wt_dcache_mem.sv"                 \
@@ -505,33 +568,48 @@ set CHIP_RTL_IMPL_FILES [list \
     "${ARIANE_ROOT}/corev_apu/fpga/src/axi_slice/src/axi_aw_buffer.sv"              \
     "${ARIANE_ROOT}/corev_apu/register_interface/src/apb_to_reg.sv"             \
     "${ARIANE_ROOT}/corev_apu/register_interface/src/reg_intf.sv"               \
-    "${ARIANE_ROOT}/corev_apu/register_interface/src/reg_intf_pkg.sv"           \
-    "${ARIANE_ROOT}/core/fpu/src/fpu_div_sqrt_mvp/hdl/defs_div_sqrt_mvp.sv"      \
-    "${ARIANE_ROOT}/core/fpu/src/fpu_div_sqrt_mvp/hdl/control_mvp.sv"            \
-    "${ARIANE_ROOT}/core/fpu/src/fpu_div_sqrt_mvp/hdl/div_sqrt_mvp_wrapper.sv"   \
-    "${ARIANE_ROOT}/core/fpu/src/fpu_div_sqrt_mvp/hdl/div_sqrt_top_mvp.sv"       \
-    "${ARIANE_ROOT}/core/fpu/src/fpu_div_sqrt_mvp/hdl/iteration_div_sqrt_mvp.sv" \
-    "${ARIANE_ROOT}/core/fpu/src/fpu_div_sqrt_mvp/hdl/norm_div_sqrt_mvp.sv"      \
-    "${ARIANE_ROOT}/core/fpu/src/fpu_div_sqrt_mvp/hdl/nrbd_nrsc_mvp.sv"          \
-    "${ARIANE_ROOT}/core/fpu/src/fpu_div_sqrt_mvp/hdl/preprocess_mvp.sv"         \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_cast_multi.sv"                            \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_classifier.sv"                            \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_divsqrt_multi.sv"                         \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_fma_multi.sv"                             \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_fma.sv"                                   \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_noncomp.sv"                               \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_opgroup_block.sv"                         \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_opgroup_fmt_slice.sv"                     \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_opgroup_multifmt_slice.sv"                \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_rounding.sv"                              \
-    "${ARIANE_ROOT}/core/fpu/src/fpnew_top.sv" \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpu_div_sqrt_mvp/hdl/defs_div_sqrt_mvp.sv"      \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpu_div_sqrt_mvp/hdl/control_mvp.sv"            \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpu_div_sqrt_mvp/hdl/div_sqrt_mvp_wrapper.sv"   \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpu_div_sqrt_mvp/hdl/div_sqrt_top_mvp.sv"       \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpu_div_sqrt_mvp/hdl/iteration_div_sqrt_mvp.sv" \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpu_div_sqrt_mvp/hdl/norm_div_sqrt_mvp.sv"      \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpu_div_sqrt_mvp/hdl/nrbd_nrsc_mvp.sv"          \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpu_div_sqrt_mvp/hdl/preprocess_mvp.sv"         \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_cast_multi.sv"                            \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_classifier.sv"                            \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_divsqrt_multi.sv"                         \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_divsqrt_th_64_multi.sv"                         \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/clk/rtl/gated_clk_cell.v" \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/vfdsu/rtl/ct_vfdsu_ctrl.v" \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/vfdsu/rtl/ct_vfdsu_double.v" \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/vfdsu/rtl/ct_vfdsu_ff1.v" \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/vfdsu/rtl/ct_vfdsu_pack.v" \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/vfdsu/rtl/ct_vfdsu_prepare.v" \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/vfdsu/rtl/ct_vfdsu_round.v" \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/vfdsu/rtl/ct_vfdsu_scalar_dp.v" \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/vfdsu/rtl/ct_vfdsu_srt.v" \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/vfdsu/rtl/ct_vfdsu_srt_radix16_bound_table.v" \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/vfdsu/rtl/ct_vfdsu_srt_radix16_with_sqrt.v" \
+    "${ARIANE_ROOT}/core/cvfpu/vendor/openc910/C910_RTL_FACTORY/gen_rtl/vfdsu/rtl/ct_vfdsu_top.v" \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_fma_multi.sv"                             \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_fma.sv"                                   \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_noncomp.sv"                               \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_opgroup_block.sv"                         \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_opgroup_fmt_slice.sv"                     \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_opgroup_multifmt_slice.sv"                \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_rounding.sv"                              \
+    "${ARIANE_ROOT}/core/cvfpu/src/fpnew_top.sv" \
     "${ARIANE_ROOT}/core/pmp/src/pmp.sv" \
-    "${ARIANE_ROOT}/core/pmp/src/pmp_entry.sv" \                                \
+    "${ARIANE_ROOT}/core/pmp/src/pmp_entry.sv" \
+    "${ARIANE_ROOT}/core/pmp/src/pmp_data_if.sv" \
     "${ARIANE_ROOT}/core/cvxif_example/cvxif_example_coprocessor.sv" \
     "${ARIANE_ROOT}/core/cvxif_example/instr_decoder.sv" \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/counter.sv" \
-    "${ARIANE_ROOT}/common/submodules/common_cells/src/delta_counter.sv" \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/counter.sv" \
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/src/delta_counter.sv" \
     "${ARIANE_ROOT}/core/cvxif_fu.sv" \
+    "${ARIANE_ROOT}/core/cvxif_issue_register_commit_if_driver.sv" \
+    "${ARIANE_ROOT}/core/cvxif_compressed_if_driver.sv" \
 ]
 
 set CHIP_INCLUDE_FILES [list \
@@ -733,7 +811,7 @@ set CHIPSET_INCLUDE_FILES [list \
     "${DV_ROOT}/design/chipset/include/uart16550_define.vh" \
     "${DV_ROOT}/design/chipset/include/chipset_define.vh" \
     "${DV_ROOT}/design/chipset/noc_axi4_bridge/rtl/noc_axi4_bridge_define.vh" \
-    "${ARIANE_ROOT}/src/common_cells/include/common_cells/registers.svh"
+    "${ARIANE_ROOT}/vendor/pulp-platform/common_cells/include/common_cells/registers.svh"
 ]
 
 set CHIPSET_IP_FILE_PREFIXES [list \
